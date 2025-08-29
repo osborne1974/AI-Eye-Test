@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Vision Measurement Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --danger: #ef233c;
+            --success: #4cc9f0;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f7ff;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        .control-panel {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            height: fit-content;
+        }
+
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-title svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--gray);
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #d90429;
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        .camera-preview {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            background-color: var(--dark);
+            aspect-ratio: 16/9;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .results-panel {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f3f9;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: var(--gray);
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .instructions {
+            background-color: #f8f9fe;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .instructions-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .instructions-list {
+            padding-left: 1.25rem;
+        }
+
+        .instructions-list li {
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .camera-switch {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s;
+        }
+
+        .camera-switch:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .camera-preview {
+                aspect-ratio: 4/3;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">PV</span>
+                <span>Pro Vision</span>
+            </div>
+            <button class="back-btn" id="backBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z" />
+                </svg>
+                Back to Menu
+            </button>
+        </header>
+
+        <div class="main-content">
+            <div class="control-panel">
+                <h2 class="panel-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path d="M9.465 10H12a2 2 0 1 1 0 4H9.465c.34-.588.535-1.271.535-2 0-.729-.195-1.412-.535-2z" />
+                        <path
+                            d="M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm.535-10a3.975 3.975 0 0 1-.409-1H4a1 1 0 0 1 0-2h2.126c.091-.355.23-.69.41-1H4a2 2 0 1 0 0 4h2.535z" />
+                        <path d="M14 4a4 4 0 1 1-8 0 4 4 0 0 1 8 0z" />
+                    </svg>
+                    Measurement Settings
+                </h2>
+
+                <div class="form-group">
+                    <label for="referenceValue">Reference Length (mm)</label>
+                    <input type="number" id="referenceValue" step="0.01" placeholder="Enter known measurement">
+                </div>
+
+                <div class="form-group">
+                    <label for="cameraSelect">Camera</label>
+                    <select id="cameraSelect">
+                        <option value="environment">Back Camera</option>
+                        <option value="user">Front Camera</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="startCameraBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M0 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6zm2-1a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H2z" />
+                            <path d="M8 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                        </svg>
+                        Start Camera
+                    </button>
+                    <button class="btn btn-danger" id="stopCameraBtn" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5z" />
+                            <path
+                                d="M0 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6zm2-1a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H2z" />
+                        </svg>
+                        Stop Camera
+                    </button>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="measureBtn" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z" />
+                            <path
+                                d="M8 4a.5.5 0 0 1 .5.5V6H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V7H6a.5.5 0 0 1 0-1h1.5V4.5A.5.5 0 0 1 8 4z" />
+                        </svg>
+                        Start Measurement
+                    </button>
+                    <button class="btn btn-secondary" id="resetBtn" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z" />
+                            <path
+                                d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z" />
+                        </svg>
+                        Reset
+                    </button>
+                </div>
+
+                <div class="results-panel">
+                    <h3 class="panel-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                            <path
+                                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                        </svg>
+                        Measurement Results
+                    </h3>
+
+                    <div class="result-item">
+                        <span class="result-label">Reference Length:</span>
+                        <span class="result-value" id="refLengthDisplay">0 px</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Actual Length:</span>
+                        <span class="result-value" id="actualLengthDisplay">0 mm</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Scale:</span>
+                        <span class="result-value" id="scaleDisplay">0 mm/px</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Current Measurement:</span>
+                        <span class="result-value" id="currentMeasurementDisplay">0 mm</span>
+                    </div>
+                </div>
+
+                <div class="instructions">
+                    <h3 class="instructions-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+                        </svg>
+                        Instructions
+                    </h3>
+                    <ol class="instructions-list">
+                        <li>Select your camera (front or back)</li>
+                        <li>Click "Start Camera" to begin the video feed</li>
+                        <li>Enter a known measurement (reference value in mm)</li>
+                        <li>Click "Start Measurement"</li>
+                        <li>Click and drag to draw a line along the reference object</li>
+                        <li>Release to set the reference scale</li>
+                        <li>Now measure any other object by clicking and dragging</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="camera-preview">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+                <button class="camera-switch" id="switchCameraBtn" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path d="M5 8c0-1.657 2.343-3 4-3V4a4 4 0 0 0-4 4z" />
+                        <path
+                            d="M12.318 3h2.015C15.253 3 16 3.746 16 4.667v6.666c0 .92-.746 1.667-1.667 1.667h-2.015A5.97 5.97 0 0 1 9 14a5.972 5.972 0 0 1-3.318-1H1.667C.747 13 0 12.254 0 11.333V4.667C0 3.747.746 3 1.667 3H2a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1h.682A5.97 5.97 0 0 1 9 2c1.227 0 2.367.368 3.318 1zM2 4.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0zM14 8A5 5 0 1 0 4 8a5 5 0 0 0 10 0z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const referenceValueInput = document.getElementById('referenceValue');
+            const cameraSelect = document.getElementById('cameraSelect');
+            const startCameraBtn = document.getElementById('startCameraBtn');
+            const stopCameraBtn = document.getElementById('stopCameraBtn');
+            const measureBtn = document.getElementById('measureBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const switchCameraBtn = document.getElementById('switchCameraBtn');
+            const backBtn = document.getElementById('backBtn');
+            const refLengthDisplay = document.getElementById('refLengthDisplay');
+            const actualLengthDisplay = document.getElementById('actualLengthDisplay');
+            const scaleDisplay = document.getElementById('scaleDisplay');
+            const currentMeasurementDisplay = document.getElementById('currentMeasurementDisplay');
+
+            let stream = null;
+            let scale = 0; // mm per pixel
+            let isMeasuring = false;
+            let isReferenceSet = false;
+            let startX, startY, endX, endY;
+            let isDrawing = false;
+            let referencePixels = 0;
+            let currentFacingMode = 'environment'; // Default to back camera
+
+            // Start camera stream
+            async function startCamera() {
+                try {
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                    }
+
+                    currentFacingMode = cameraSelect.value;
+
+                    const constraints = {
+                        video: {
+                            facingMode: currentFacingMode,
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }
+                    };
+
+                    stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    video.srcObject = stream;
+
+                    // Wait for video to be ready
+                    await new Promise((resolve) => {
+                        video.onloadedmetadata = () => {
+                            video.play();
+                            resolve();
+                        };
+                    });
+
+                    // Set canvas size to match video
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+
+                    // Enable controls
+                    stopCameraBtn.disabled = false;
+                    measureBtn.disabled = false;
+                    startCameraBtn.disabled = true;
+                    cameraSelect.disabled = true;
+                    switchCameraBtn.disabled = false;
+                    resetBtn.disabled = false;
+
+                    // Start drawing video frames to canvas
+                    drawVideoFrame();
+                } catch (error) {
+                    console.error('Error starting camera:', error);
+                    alert('Could not start camera. Please check permissions.');
+                }
+            }
+
+            // Switch between front and back camera
+            async function switchCamera() {
+                currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+                cameraSelect.value = currentFacingMode;
+                await startCamera();
+            }
+
+            // Draw video frame to canvas
+            function drawVideoFrame() {
+                if (!stream) return;
+
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // If measuring, draw the measurement line
+                if (isDrawing) {
+                    drawMeasurementLine();
+                }
+
+                requestAnimationFrame(drawVideoFrame);
+            }
+
+            // Stop camera stream
+            function stopCamera() {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+
+                video.srcObject = null;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Reset controls
+                stopCameraBtn.disabled = true;
+                measureBtn.disabled = true;
+                resetBtn.disabled = true;
+                startCameraBtn.disabled = false;
+                cameraSelect.disabled = false;
+                switchCameraBtn.disabled = true;
+
+                // Reset measurement state
+                resetMeasurement();
+            }
+
+            // Calculate distance between two points
+            function calculateDistance(x1, y1, x2, y2) {
+                return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            }
+
+            // Draw measurement line
+            function drawMeasurementLine() {
+                // Clear canvas (video will be redrawn in next frame)
+
+                // Draw line
+                ctx.strokeStyle = '#4361ee';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+
+                // Draw start and end points
+                ctx.fillStyle = '#ef233c';
+                ctx.beginPath();
+                ctx.arc(startX, startY, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(endX, endY, 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Calculate and display length
+                const lengthPx = calculateDistance(startX, startY, endX, endY);
+                const lengthMm = isReferenceSet ? lengthPx * scale : lengthPx;
+
+                // Display length text
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 16px Inter';
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                const textX = (startX + endX) / 2;
+                const textY = (startY + endY) / 2;
+                const text = isReferenceSet ? `${lengthMm.toFixed(2)} mm` : `${lengthPx.toFixed(2)} px`;
+
+                // Text with outline
+                ctx.strokeText(text, textX + 10, textY);
+                ctx.fillText(text, textX + 10, textY);
+
+                // Update display
+                if (isReferenceSet) {
+                    currentMeasurementDisplay.textContent = `${lengthMm.toFixed(2)} mm`;
+                }
+            }
+
+            // Reset measurement state
+            function resetMeasurement() {
+                isMeasuring = false;
+                isReferenceSet = false;
+                scale = 0;
+                referencePixels = 0;
+                isDrawing = false;
+
+                refLengthDisplay.textContent = '0 px';
+                actualLengthDisplay.textContent = '0 mm';
+                scaleDisplay.textContent = '0 mm/px';
+                currentMeasurementDisplay.textContent = '0 mm';
+            }
+
+            // Event listeners
+            startCameraBtn.addEventListener('click', startCamera);
+            stopCameraBtn.addEventListener('click', stopCamera);
+            switchCameraBtn.addEventListener('click', switchCamera);
+            backBtn.addEventListener('click', () => {
+                window.location.href = 'MD.html';
+            });
+
+            measureBtn.addEventListener('click', function () {
+                if (!referenceValueInput.value || isNaN(referenceValueInput.value)) {
+                    alert('Please enter a valid reference value');
+                    return;
+                }
+
+                isMeasuring = true;
+                isReferenceSet = false;
+                alert('Click and drag to draw a line along the reference object. Release to set scale.');
+            });
+
+            resetBtn.addEventListener('click', function () {
+                resetMeasurement();
+            });
+
+            canvas.addEventListener('mousedown', function (e) {
+                if (!isMeasuring) return;
+
+                const rect = canvas.getBoundingClientRect();
+                startX = e.clientX - rect.left;
+                startY = e.clientY - rect.top;
+                endX = startX;
+                endY = startY;
+                isDrawing = true;
+            });
+
+            canvas.addEventListener('mousemove', function (e) {
+                if (!isDrawing) return;
+
+                const rect = canvas.getBoundingClientRect();
+                endX = e.clientX - rect.left;
+                endY = e.clientY - rect.top;
+            });
+
+            canvas.addEventListener('mouseup', function () {
+                if (!isDrawing) return;
+
+                isDrawing = false;
+                const lengthPx = calculateDistance(startX, startY, endX, endY);
+
+                if (!isReferenceSet) {
+                    // Set reference scale
+                    const referenceValue = parseFloat(referenceValueInput.value);
+                    scale = referenceValue / lengthPx;
+                    referencePixels = lengthPx;
+
+                    refLengthDisplay.textContent = `${lengthPx.toFixed(2)} px`;
+                    actualLengthDisplay.textContent = `${referenceValue.toFixed(2)} mm`;
+                    scaleDisplay.textContent = `${scale.toFixed(6)} mm/px`;
+
+                    isReferenceSet = true;
+                    alert('Reference set! Now you can measure any object in the view.');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Color Vision Test</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <style>
+        :root {
+            --primary: #4285F4;
+            --primary-dark: #3367D6;
+            --success: #34A853;
+            --error: #EA4335;
+            --warning: #FBBC05;
+            --gray-light: #F5F5F5;
+            --gray-medium: #E0E0E0;
+            --gray-dark: #757575;
+            --text-primary: #212121;
+            --text-secondary: #616161;
+            --white: #FFFFFF;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--gray-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            text-align: center;
+            color: var(--primary);
+        }
+
+        h2 {
+            font-size: 1.75rem;
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-secondary {
+            background-color: var(--gray-medium);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--gray-dark);
+            color: var(--white);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Test specific styles */
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: var(--gray-medium);
+            border-radius: 8px;
+            height: 12px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 8px;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .plate-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .plate {
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .option {
+            padding: 1rem;
+            background-color: var(--gray-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-weight: 500;
+            border: 2px solid transparent;
+        }
+
+        .option:hover {
+            background-color: var(--gray-medium);
+        }
+
+        .option.selected {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary-dark);
+        }
+
+        .feedback {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .feedback.correct {
+            background-color: rgba(52, 168, 83, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .feedback.incorrect {
+            background-color: rgba(234, 67, 53, 0.1);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Results section */
+        .result-card {
+            text-align: center;
+            padding: 2.5rem;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-score {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            color: var(--primary);
+        }
+
+        .result-details {
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .normal {
+            color: var(--success);
+        }
+
+        .mild {
+            color: var(--warning);
+        }
+
+        .deficient {
+            color: var(--error);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .plate {
+                width: 280px;
+                height: 280px;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .options-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .plate {
+                width: 250px;
+                height: 250px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Professional Color Vision Test</h1>
+
+        <!-- Introduction Screen -->
+        <div id="intro" class="card">
+            <h2>Color Vision Assessment</h2>
+            <p>This professional test evaluates your color vision using simulated Ishihara plates. The test helps
+                identify potential color vision deficiencies, including red-green color blindness.</p>
+
+            <div style="margin: 2rem 0;">
+                <h3>Test Instructions:</h3>
+                <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                    <li style="margin-bottom: 0.5rem;">You will see a series of colored plates</li>
+                    <li style="margin-bottom: 0.5rem;">For each plate, select the number or pattern you see</li>
+                    <li style="margin-bottom: 0.5rem;">If you cannot see any number, select "Nothing"</li>
+                    <li style="margin-bottom: 0.5rem;">The test consists of 8 plates</li>
+                    <li>Perform the test under normal lighting conditions</li>
+                </ul>
+            </div>
+
+            <div class="action-buttons">
+                <button id="start-btn" class="btn">Begin Test</button>
+            </div>
+        </div>
+
+        <!-- Test Screen -->
+        <div id="test" class="card hidden">
+            <div class="test-header">
+                <h2>Plate <span id="plate-number">1</span> of 8</h2>
+                <button id="back-to-menu-btn" class="btn btn-outline">Back to Menu</button>
+            </div>
+
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+
+            <div class="plate-container">
+                <div id="plate" class="plate"></div>
+
+                <div class="options-grid" id="options"></div>
+
+                <div id="feedback" class="feedback hidden"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="next-btn" class="btn hidden">Continue</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="summary" class="card result-card hidden">
+            <div class="result-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+
+            <h2>Test Complete</h2>
+
+            <div class="result-score">
+                <span id="score">0</span>/<span>8</span>
+            </div>
+
+            <div id="final-result" class="result-details"></div>
+
+            <div id="result-details" style="margin-bottom: 2rem;"></div>
+
+            <div class="action-buttons">
+                <button id="restart-btn" class="btn">Retake Test</button>
+                <button id="back-to-menu-result-btn" class="btn btn-secondary">Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Test plates data
+        const plates = [
+            {
+                id: 1,
+                correctAnswer: "12",
+                options: ["12", "13", "Nothing", "17"],
+                difficulty: "easy",
+                colors: {
+                    background: [210, 180, 140],
+                    dots: [
+                        { color: [200, 50, 50], count: 40, size: [3, 5] },
+                        { color: [50, 150, 50], count: 40, size: [3, 5] },
+                        { color: [180, 180, 180], count: 200, size: [2, 4] }
+                    ]
+                }
+            },
+            {
+                id: 2,
+                correctAnswer: "8",
+                options: ["3", "8", "Nothing", "9"],
+                difficulty: "easy",
+                colors: {
+                    background: [180, 210, 140],
+                    dots: [
+                        { color: [180, 50, 50], count: 50, size: [3, 5] },
+                        { color: [50, 200, 50], count: 30, size: [3, 5] },
+                        { color: [200, 200, 200], count: 180, size: [2, 4] }
+                    ]
+                }
+            },
+            {
+                id: 3,
+                correctAnswer: "6",
+                options: ["5", "6", "Nothing", "9"],
+                difficulty: "medium",
+                colors: {
+                    background: [140, 180, 210],
+                    dots: [
+                        { color: [220, 50, 50], count: 45, size: [3, 5] },
+                        { color: [50, 180, 50], count: 45, size: [3, 5] },
+                        { color: [190, 190, 190], count: 190, size: [2, 4] }
+                    ]
+                }
+            },
+            {
+                id: 4,
+                correctAnswer: "29",
+                options: ["20", "29", "Nothing", "70"],
+                difficulty: "medium",
+                colors: {
+                    background: [210, 140, 180],
+                    dots: [
+                        { color: [210, 60, 60], count: 35, size: [3, 5] },
+                        { color: [60, 170, 60], count: 45, size: [3, 5] },
+                        { color: [170, 170, 170], count: 200, size: [2, 4] }
+                    ]
+                }
+            },
+            {
+                id: 5,
+                correctAnswer: "57",
+                options: ["35", "57", "Nothing", "85"],
+                difficulty: "hard",
+                colors: {
+                    background: [180, 140, 210],
+                    dots: [
+                        { color: [190, 40, 40], count: 40, size: [3, 5] },
+                        { color: [40, 190, 40], count: 40, size: [3, 5] },
+                        { color: [180, 180, 180], count: 200, size: [2, 4] }
+                    ]
+                }
+            },
+            {
+                id: 6,
+                correctAnswer: "Nothing",
+                options: ["2", "4", "Nothing", "7"],
+                difficulty: "hard",
+                colors: {
+                    background: [140, 210, 180],
+                    dots: [
+                        { color: [170, 30, 30], count: 50, size: [3, 5] },
+                        { color: [30, 170, 30], count: 50, size: [3, 5] },
+                        { color: [200, 200, 200], count: 180, size: [2, 4] }
+                    ]
+                }
+            },
+            {
+                id: 7,
+                correctAnswer: "15",
+                options: ["15", "16", "Nothing", "19"],
+                difficulty: "medium",
+                colors: {
+                    background: [210, 210, 140],
+                    dots: [
+                        { color: [200, 40, 40], count: 35, size: [3, 5] },
+                        { color: [40, 200, 40], count: 45, size: [3, 5] },
+                        { color: [190, 190, 190], count: 200, size: [2, 4] }
+                    ]
+                }
+            },
+            {
+                id: 8,
+                correctAnswer: "74",
+                options: ["21", "74", "Nothing", "98"],
+                difficulty: "hard",
+                colors: {
+                    background: [160, 160, 160],
+                    dots: [
+                        { color: [180, 50, 50], count: 40, size: [3, 5] },
+                        { color: [50, 180, 50], count: 40, size: [3, 5] },
+                        { color: [140, 140, 140], count: 200, size: [2, 4] }
+                    ]
+                }
+            }
+        ];
+
+        // Test state
+        let currentPlateIndex = 0;
+        let score = 0;
+        let userAnswers = [];
+        let selectedOption = null;
+
+        // DOM elements
+        const introSection = document.getElementById('intro');
+        const testSection = document.getElementById('test');
+        const summarySection = document.getElementById('summary');
+        const plateElement = document.getElementById('plate');
+        const optionsElement = document.getElementById('options');
+        const feedbackElement = document.getElementById('feedback');
+        const nextButton = document.getElementById('next-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const plateNumberElement = document.getElementById('plate-number');
+        const scoreElement = document.getElementById('score');
+        const finalResultElement = document.getElementById('final-result');
+        const resultDetailsElement = document.getElementById('result-details');
+        const startButton = document.getElementById('start-btn');
+        const restartButton = document.getElementById('restart-btn');
+        const backToMenuButton = document.getElementById('back-to-menu-btn');
+        const backToMenuResultButton = document.getElementById('back-to-menu-result-btn');
+
+        // Initialize the test
+        function startTest() {
+            introSection.classList.add('hidden');
+            testSection.classList.remove('hidden');
+            showPlate(currentPlateIndex);
+        }
+
+        // Show a plate
+        function showPlate(index) {
+            if (index >= plates.length) {
+                showResults();
+                return;
+            }
+
+            const plate = plates[index];
+            selectedOption = null;
+
+            // Update progress
+            progressBar.style.width = `${(index / plates.length) * 100}%`;
+            plateNumberElement.textContent = index + 1;
+
+            // Clear previous options and feedback
+            optionsElement.innerHTML = '';
+            feedbackElement.textContent = '';
+            feedbackElement.className = 'feedback hidden';
+            nextButton.classList.add('hidden');
+
+            // Create the plate visualization
+            createPlateVisualization(plate);
+
+            // Create options
+            plate.options.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                optionElement.textContent = option;
+                optionElement.addEventListener('click', () => selectOption(option, optionElement));
+                optionsElement.appendChild(optionElement);
+            });
+        }
+
+        // Create the visual representation of the plate
+        function createPlateVisualization(plate) {
+            plateElement.innerHTML = '';
+            plateElement.style.backgroundColor = `rgb(${plate.colors.background.join(',')})`;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 350;
+            canvas.height = 350;
+            plateElement.appendChild(canvas);
+
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(canvas.width, canvas.height) * 0.45;
+
+            // Draw background
+            ctx.fillStyle = `rgb(${plate.colors.background.join(',')})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw dots
+            plate.colors.dots.forEach(dotGroup => {
+                for (let i = 0; i < dotGroup.count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * radius;
+                    const x = centerX + Math.cos(angle) * distance;
+                    const y = centerY + Math.sin(angle) * distance;
+                    const dotSize = dotGroup.size[0] + Math.random() * (dotGroup.size[1] - dotGroup.size[0]);
+
+                    ctx.fillStyle = `rgb(${dotGroup.color.join(',')})`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, dotSize, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            // For plates that show numbers, arrange dots to form the number
+            if (plate.correctAnswer !== "Nothing") {
+                const number = plate.correctAnswer;
+                const digitCount = number.length;
+                const digitSpacing = plate.difficulty === "hard" ? 35 : 40;
+
+                for (let d = 0; d < digitCount; d++) {
+                    const digit = number[d];
+                    const digitX = centerX + (d - (digitCount - 1) / 2) * digitSpacing;
+                    const digitY = centerY;
+
+                    drawDigitDots(ctx, digit, digitX, digitY, plate.colors.dots[0].color, plate.difficulty);
+                }
+            }
+        }
+
+        // Improved digit drawing function
+        function drawDigitDots(ctx, digit, centerX, centerY, color, difficulty) {
+            const digitPatterns = {
+                '0': [[0, 0, 1, 1, 1, 0, 0], [0, 1, 0, 0, 0, 1, 0], [0, 1, 0, 0, 0, 1, 0], [0, 1, 0, 0, 0, 1, 0], [0, 0, 1, 1, 1, 0, 0]],
+                '1': [[0, 0, 1, 0, 0], [0, 1, 1, 0, 0], [0, 0, 1, 0, 0], [0, 0, 1, 0, 0], [0, 1, 1, 1, 0]],
+                '2': [[0, 1, 1, 1, 0], [1, 0, 0, 0, 1], [0, 0, 0, 1, 0], [0, 0, 1, 0, 0], [0, 1, 1, 1, 1]],
+                '3': [[1, 1, 1, 1, 0], [0, 0, 0, 0, 1], [0, 1, 1, 1, 0], [0, 0, 0, 0, 1], [1, 1, 1, 1, 0]],
+                '4': [[0, 0, 0, 1, 0], [0, 0, 1, 1, 0], [0, 1, 0, 1, 0], [1, 1, 1, 1, 1], [0, 0, 0, 1, 0]],
+                '5': [[1, 1, 1, 1, 1], [1, 0, 0, 0, 0], [1, 1, 1, 1, 0], [0, 0, 0, 0, 1], [1, 1, 1, 1, 0]],
+                '6': [[0, 1, 1, 1, 0], [1, 0, 0, 0, 0], [1, 1, 1, 1, 0], [1, 0, 0, 0, 1], [0, 1, 1, 1, 0]],
+                '7': [[1, 1, 1, 1, 1], [0, 0, 0, 1, 0], [0, 0, 1, 0, 0], [0, 1, 0, 0, 0], [1, 0, 0, 0, 0]],
+                '8': [[0, 1, 1, 1, 0], [1, 0, 0, 0, 1], [0, 1, 1, 1, 0], [1, 0, 0, 0, 1], [0, 1, 1, 1, 0]],
+                '9': [[0, 1, 1, 1, 0], [1, 0, 0, 0, 1], [0, 1, 1, 1, 1], [0, 0, 0, 0, 1], [0, 1, 1, 1, 0]]
+            };
+
+            const pattern = digitPatterns[digit] || digitPatterns['0'];
+            const cellSize = difficulty === "hard" ? 8 : 10;
+            const startX = centerX - (pattern[0].length * cellSize) / 2;
+            const startY = centerY - (pattern.length * cellSize) / 2;
+
+            ctx.fillStyle = `rgb(${color.join(',')})`;
+
+            for (let y = 0; y < pattern.length; y++) {
+                for (let x = 0; x < pattern[y].length; x++) {
+                    if (pattern[y][x] === 1) {
+                        const dotX = startX + x * cellSize + cellSize / 2;
+                        const dotY = startY + y * cellSize + cellSize / 2;
+                        const dotSize = difficulty === "hard" ? 3 + Math.random() * 2 : 4 + Math.random() * 2;
+
+                        ctx.beginPath();
+                        ctx.arc(dotX, dotY, dotSize, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+        }
+
+        // Handle option selection
+        function selectOption(option, element) {
+            // Remove selected class from all options
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            // Add selected class to clicked option
+            element.classList.add('selected');
+            selectedOption = option;
+
+            // Show next button
+            nextButton.classList.remove('hidden');
+        }
+
+        // Move to next plate
+        function nextPlate() {
+            if (selectedOption === null) return;
+
+            const currentPlate = plates[currentPlateIndex];
+            const isCorrect = selectedOption === currentPlate.correctAnswer;
+
+            userAnswers.push({
+                plateId: currentPlate.id,
+                answer: selectedOption,
+                correct: isCorrect,
+                difficulty: currentPlate.difficulty
+            });
+
+            // Show feedback
+            feedbackElement.classList.remove('hidden');
+            if (isCorrect) {
+                score++;
+                feedbackElement.textContent = "Correct!";
+                feedbackElement.className = "feedback correct";
+            } else {
+                feedbackElement.textContent = `Incorrect. The correct answer was ${currentPlate.correctAnswer}.`;
+                feedbackElement.className = "feedback incorrect";
+            }
+
+            currentPlateIndex++;
+
+            if (currentPlateIndex < plates.length) {
+                setTimeout(() => showPlate(currentPlateIndex), 1500);
+            } else {
+                setTimeout(showResults, 1500);
+            }
+        }
+
+        // Show test results
+        function showResults() {
+            testSection.classList.add('hidden');
+            summarySection.classList.remove('hidden');
+
+            const percentage = Math.round((score / plates.length) * 100);
+            scoreElement.textContent = score;
+
+            // Calculate results by difficulty
+            const easyResults = userAnswers.filter(a => a.difficulty === "easy").filter(a => a.correct).length;
+            const mediumResults = userAnswers.filter(a => a.difficulty === "medium").filter(a => a.correct).length;
+            const hardResults = userAnswers.filter(a => a.difficulty === "hard").filter(a => a.correct).length;
+
+            if (percentage >= 88) {
+                finalResultElement.innerHTML = `<span class="normal">Normal Color Vision</span>`;
+                resultDetailsElement.innerHTML = `
+                    <p>You scored ${score} out of ${plates.length} (${percentage}%). Your color vision appears to be normal.</p>
+                    <p>Breakdown by difficulty:</p>
+                    <ul style="text-align: left; max-width: 300px; margin: 0.5rem auto;">
+                        <li>Easy plates: ${easyResults}/3 correct</li>
+                        <li>Medium plates: ${mediumResults}/3 correct</li>
+                        <li>Hard plates: ${hardResults}/2 correct</li>
+                    </ul>
+                `;
+            } else if (percentage >= 63) {
+                finalResultElement.innerHTML = `<span class="mild">Mild Color Deficiency</span>`;
+                resultDetailsElement.innerHTML = `
+                    <p>You scored ${score} out of ${plates.length} (${percentage}%). You may have a mild color vision deficiency.</p>
+                    <p>Breakdown by difficulty:</p>
+                    <ul style="text-align: left; max-width: 300px; margin: 0.5rem auto;">
+                        <li>Easy plates: ${easyResults}/3 correct</li>
+                        <li>Medium plates: ${mediumResults}/3 correct</li>
+                        <li>Hard plates: ${hardResults}/2 correct</li>
+                    </ul>
+                    <p>Consider consulting an eye care professional for a comprehensive evaluation.</p>
+                `;
+            } else {
+                finalResultElement.innerHTML = `<span class="deficient">Color Vision Deficiency</span>`;
+                resultDetailsElement.innerHTML = `
+                    <p>You scored ${score} out of ${plates.length} (${percentage}%). You likely have a color vision deficiency (color blindness).</p>
+                    <p>Breakdown by difficulty:</p>
+                    <ul style="text-align: left; max-width: 300px; margin: 0.5rem auto;">
+                        <li>Easy plates: ${easyResults}/3 correct</li>
+                        <li>Medium plates: ${mediumResults}/3 correct</li>
+                        <li>Hard plates: ${hardResults}/2 correct</li>
+                    </ul>
+                    <p>We recommend consulting an eye care professional for confirmation and advice.</p>
+                `;
+            }
+        }
+
+        // Restart the test
+        function restartTest() {
+            currentPlateIndex = 0;
+            score = 0;
+            userAnswers = [];
+            selectedOption = null;
+
+            summarySection.classList.add('hidden');
+            testSection.classList.remove('hidden');
+
+            showPlate(currentPlateIndex);
+        }
+
+        // Return to main menu
+        function backToMenu() {
+            currentPlateIndex = 0;
+            score = 0;
+            userAnswers = [];
+            selectedOption = null;
+
+            testSection.classList.add('hidden');
+            summarySection.classList.add('hidden');
+            introSection.classList.remove('hidden');
+        }
+
+        // Event listeners
+        startButton.addEventListener('click', startTest);
+        nextButton.addEventListener('click', nextPlate);
+        restartButton.addEventListener('click', restartTest);
+        backToMenuButton.addEventListener('click', () => window.location.href = 'MD.html');
+        backToMenuResultButton.addEventListener('click', backToMenu);
+    </script>
+</body>
+
+</html>

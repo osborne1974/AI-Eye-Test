@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision Testing Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #777;
+            --menu-width: 250px;
+            --header-height: 60px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f5f7ff;
+            color: var(--text-color);
+        }
+
+        /* Sidebar Menu */
+        .sidebar {
+            width: var(--menu-width);
+            height: 100vh;
+            background: #fff;
+            box-shadow: 2px 0 16px rgba(67, 107, 255, 0.07), 0 1.5px 0 #f0f4ff;
+            position: fixed;
+            transition: all var(--transition-speed) ease;
+            z-index: 100;
+            border-radius: 1.5rem 0 0 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 1.5rem;
+        }
+
+        .sidebar-header {
+            padding: 0 0 1.5rem 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        .sidebar-header .sidebar-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            text-decoration: none;
+        }
+
+        .sidebar-header h2 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            display: inline-block;
+            background: #f5f7ff;
+            border-radius: 0.5rem;
+            padding: 0.25rem 1rem;
+        }
+
+        .menu-items {
+            padding: 0;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .menu-item {
+            margin: 0.25rem 0.75rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            display: flex;
+            align-items: center;
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 1.05rem;
+            box-shadow: none;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            width: 100%;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0.75rem;
+            gap: 0.75rem;
+            transition: background 0.18s, color 0.18s;
+        }
+
+        .menu-item i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            min-width: 22px;
+            text-align: center;
+        }
+
+        .menu-item.active a,
+        .menu-item a:active,
+        .menu-item a:focus {
+            background: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(67, 107, 255, 0.08);
+        }
+
+        .menu-item.active i,
+        .menu-item a:active i,
+        .menu-item a:focus i {
+            color: #fff;
+        }
+
+        .menu-item a:hover {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .menu-item a:hover i {
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--menu-width);
+            min-height: 100vh;
+            transition: all var(--transition-speed) ease;
+        }
+
+        /* Header */
+        header {
+            height: var(--header-height);
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: none;
+            margin-right: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .user-profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 20px;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        .dashboard-title {
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+
+        /* Icons */
+        @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
+    </style>
+</head>
+
+<body onload="checkAuth()">
+    <!-- Sidebar Menu -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="/MD.html" class="sidebar-logo"><i class="fas fa-eye"></i> VisionTest</a>
+            <h2>Menu</h2>
+        </div>
+        <div class="menu-items">
+            <div class="menu-item active">
+                <a href="#dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="Visualtest.html">
+                    <i class="fas fa-eye"></i>
+                    <span>Visual test</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="Test Vision.html">
+                    <i class="fas fa-binoculars"></i>
+                    <span>Test Vision</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="EyeDominanceTester.html">
+                    <i class="fas fa-eye-dropper"></i>
+                    <span>Eye Dominance Tester</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="Distancenearvision.html">
+                    <i class="fas fa-ruler"></i>
+                    <span>Distance/Near Vision</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="Computervision.html">
+                    <i class="fas fa-desktop"></i>
+                    <span>Computer Vision</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="Colorvision.html">
+                    <i class="fas fa-palette"></i>
+                    <span>Color Vision</span>
+                </a>
+            </div>
+            <div class="menu-item">
+                <a href="Blue Light Filter RS.html">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Blue Light Filter</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header>
+            <div class="header-left">
+                <div class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <h3>Vision Testing Dashboard</h3>
+            </div>
+            <div class="header-right">
+                <div class="user-profile" id="userInfo"></div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <div class="content">
+            <h1 class="dashboard-title">Welcome to Vision Testing</h1>
+            <div class="card-container">
+                <div class="card">
+                    <h3>Visual Acuity Test</h3>
+                    <p>Test your ability to discern the details of a symbol at a given distance.</p>
+                </div>
+                <div class="card">
+                    <h3>Color Vision Test</h3>
+                    <p>Check your ability to distinguish between different colors and shades.</p>
+                </div>
+                <div class="card">
+                    <h3>Eye Dominance</h3>
+                    <p>Determine which eye is your dominant eye for better vision coordination.</p>
+                </div>
+                <div class="card">
+                    <h3>Computer Vision</h3>
+                    <p>Test how your eyes handle prolonged computer screen exposure.</p>
+                </div>
+                <div class="card">
+                    <h3>Blue Light Filter</h3>
+                    <p>Check the effectiveness of your blue light filtering solutions.</p>
+                </div>
+                <div class="card">
+                    <h3>Distance Vision</h3>
+                    <p>Assess your ability to see objects clearly at a distance.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar on mobile
+        document.querySelector('.menu-toggle').addEventListener('click', function () {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        // Set active menu item
+        const menuItems = document.querySelectorAll('.menu-item');
+        const currentPage = window.location.pathname.split('/').pop() || '#dashboard';
+
+        menuItems.forEach(item => {
+            const link = item.querySelector('a');
+            if (link.getAttribute('href') === currentPage) {
+                item.classList.add('active');
+            }
+
+            item.addEventListener('click', function () {
+                // Don't prevent default behavior for actual links
+                if (!link || link.getAttribute('href').startsWith('#')) {
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // Close sidebar on mobile after selection
+                    if (window.innerWidth <= 768) {
+                        document.querySelector('.sidebar').classList.remove('active');
+                    }
+                }
+            });
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function (event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+
+            if (window.innerWidth <= 768 &&
+                !sidebar.contains(event.target) &&
+                !menuToggle.contains(event.target) &&
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Handle dashboard link
+        document.querySelector('a[href="#dashboard"]')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector('.content').innerHTML = `
+                <h1 class="dashboard-title">Welcome to Vision Testing</h1>
+                <div class="card-container">
+                    <div class="card">
+                        <h3>Visual Acuity Test</h3>
+                        <p>Test your ability to discern the details of a symbol at a given distance.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Color Vision Test</h3>
+                        <p>Check your ability to distinguish between different colors and shades.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Eye Dominance</h3>
+                        <p>Determine which eye is your dominant eye for better vision coordination.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Computer Vision</h3>
+                        <p>Test how your eyes handle prolonged computer screen exposure.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Blue Light Filter</h3>
+                        <p>Check the effectiveness of your blue light filtering solutions.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Distance Vision</h3>
+                        <p>Assess your ability to see objects clearly at a distance.</p>
+                    </div>
+                </div>
+            `;
+
+            menuItems.forEach(i => i.classList.remove('active'));
+            this.parentElement.classList.add('active');
+        });
+
+        // Check authentication status
+        async function checkAuth() {
+            try {
+                const response = await fetch('/user/profile');
+                if (!response.ok) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                const user = await response.json();
+
+                // Check if user has dashboard access
+                if (user.role !== 'dashboard' && user.role !== 'both') {
+                    window.location.href = '/';
+                    return;
+                }
+
+                // Check if user is approved
+                if (!user.approved) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                // Set username and avatar in the top right
+                const initials = user.username
+                    .split(/\s+/)
+                    .map(word => word[0].toUpperCase())
+                    .join('').slice(0, 2);
+                document.getElementById('userInfo').innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="background: #4361ee; color: #fff; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1rem;">${initials}</div>
+                        <span style="font-weight: 500; color: #222;">${user.username}</span>
+                        <button class="btn btn-primary" onclick="logout()">Logout</button>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Authentication error:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Proper logout function
+        async function logout() {
+            try {
+                const response = await fetch('/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Logout failed. Please try again.');
+                }
+            } catch (error) {
+                alert('Logout failed. Please try again.');
+            }
+        }
+    </script>
+</body>
+
+</html>

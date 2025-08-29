@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Visual Field Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3a7bd5;
+            --secondary-color: #00d2ff;
+            --accent-color: #4fc3f7;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+            --light-bg: #f8f9fa;
+            --dark-text: #212529;
+            --light-text: #f8f9fa;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2a6bc7;
+        }
+
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: var(--dark-text);
+        }
+
+        .btn-secondary:hover {
+            background-color: #bdbdbd;
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background-color: #3da8d8;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e0e0e0;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .test-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .option-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .option-card h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .option-card p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .visual-field-test {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 600px;
+            margin: 2rem auto;
+            background-color: #333;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fixation-point {
+            width: 10px;
+            height: 10px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .test-stimulus {
+            position: absolute;
+            border-radius: 50%;
+            background-color: white;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 5;
+        }
+
+        .test-stimulus.visible {
+            opacity: 1;
+        }
+
+        .results-container {
+            display: none;
+        }
+
+        .result-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .metric-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .ai-analysis {
+            background-color: #f5f9ff;
+            border-left: 4px solid var(--accent-color);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .ai-analysis h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .ai-recommendations {
+            margin-top: 1rem;
+        }
+
+        .ai-recommendations li {
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-screen,
+        .test-screen,
+        .results-screen,
+        .instructions-screen {
+            display: none;
+        }
+
+        .active-screen {
+            display: block;
+        }
+
+        .test-progress {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .visual-field-map {
+            width: 100%;
+            max-width: 500px;
+            height: 500px;
+            margin: 2rem auto;
+            position: relative;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+        }
+
+        .visual-field-point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        .test-instructions {
+            margin-top: 2rem;
+        }
+
+        .test-instructions ol {
+            padding-left: 1.5rem;
+        }
+
+        .test-instructions li {
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .visual-field-test {
+                height: 400px;
+                max-width: 400px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">VisionCheck</div>
+        <div id="header-actions">
+            <a href="MD.html" class="btn btn-secondary">MD</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Menu Screen -->
+        <div id="menu-screen" class="menu-screen active-screen">
+            <div class="card">
+                <h1>Visual Field Test</h1>
+                <p>This test evaluates your peripheral vision by detecting light stimuli at various locations in your
+                    visual field. It can help identify blind spots, glaucoma, neurological conditions, and other vision
+                    problems.</p>
+
+                <div class="test-options">
+                    <div class="option-card">
+                        <h3>Central Field Test</h3>
+                        <p>Evaluates the central 30 degrees of your visual field with high density points.</p>
+                        <button id="central-test-btn" class="btn btn-primary">Start Central Test</button>
+                    </div>
+
+                    <div class="option-card">
+                        <h3>Full Field Test</h3>
+                        <p>Assesses the full 90 degrees of your visual field with standard density points.</p>
+                        <button id="full-test-btn" class="btn btn-primary">Start Full Test</button>
+                    </div>
+
+                    <div class="option-card">
+                        <h3>Custom Test</h3>
+                        <p>Configure your own test with specific parameters and test patterns.</p>
+                        <button id="custom-test-btn" class="btn btn-primary">Configure Test</button>
+                    </div>
+                </div>
+
+                <h2>Test Preparation</h2>
+                <ul>
+                    <li>Perform the test in a quiet, dimly lit room</li>
+                    <li>Position yourself about 30-40 cm from the screen</li>
+                    <li>Wear your usual corrective lenses if needed</li>
+                    <li>Ensure your screen brightness is at least 50%</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Instructions Screen -->
+        <div id="instructions-screen" class="instructions-screen">
+            <div class="card">
+                <h1>Test Instructions</h1>
+
+                <div class="test-instructions">
+                    <ol>
+                        <li>Focus on the central fixation point throughout the entire test</li>
+                        <li>When you see a flashing light in your peripheral vision, press the spacebar or click/tap the
+                            screen</li>
+                        <li>Respond only when you're certain you saw the light - don't guess</li>
+                        <li>The test will automatically progress through different locations</li>
+                        <li>Each eye will be tested separately - cover one eye as instructed</li>
+                    </ol>
+                </div>
+
+                <div class="form-group">
+                    <label for="test-eye">Select Eye to Test First:</label>
+                    <select id="test-eye" class="btn btn-secondary" style="width: 100%; padding: 0.8rem;">
+                        <option value="right">Right Eye (cover left eye)</option>
+                        <option value="left">Left Eye (cover right eye)</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button id="start-test-btn" class="btn btn-primary">Start Test</button>
+                    <button id="cancel-test-btn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Test Configuration Screen -->
+        <div id="custom-test-screen" class="menu-screen">
+            <div class="card">
+                <h1>Custom Test Configuration</h1>
+
+                <div class="form-group">
+                    <label for="test-pattern">Test Pattern:</label>
+                    <select id="test-pattern" class="btn btn-secondary" style="width: 100%; padding: 0.8rem;">
+                        <option value="central-30">Central 30°</option>
+                        <option value="central-60">Central 60°</option>
+                        <option value="full-90">Full 90°</option>
+                        <option value="glaucoma">Glaucoma Pattern</option>
+                        <option value="neurological">Neurological Pattern</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="test-density">Test Point Density:</label>
+                    <input type="range" id="test-density" min="1" max="5" value="3">
+                    <span class="slider-value" id="test-density-value">Standard</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="stimulus-duration">Stimulus Duration (ms):</label>
+                    <input type="range" id="stimulus-duration" min="100" max="1000" step="100" value="300">
+                    <span class="slider-value" id="stimulus-duration-value">300ms</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="stimulus-intensity">Stimulus Intensity:</label>
+                    <input type="range" id="stimulus-intensity" min="1" max="10" value="6">
+                    <span class="slider-value" id="stimulus-intensity-value">6</span>
+                </div>
+
+                <div class="btn-group">
+                    <button id="start-custom-test-btn" class="btn btn-primary">Start Custom Test</button>
+                    <button id="cancel-custom-test-btn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Screen -->
+        <div id="test-screen" class="test-screen">
+            <div class="card">
+                <div class="test-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-text" id="progress-text">Point 1 of 30 | Right Eye</div>
+                </div>
+
+                <div class="visual-field-test" id="visual-field-test">
+                    <div class="fixation-point" id="fixation-point"></div>
+                    <!-- Test stimuli will be generated here -->
+                </div>
+
+                <div class="btn-group">
+                    <button id="pause-test-btn" class="btn btn-accent">Pause Test</button>
+                    <button id="stop-test-btn" class="btn btn-secondary">Stop Test</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="results-screen">
+            <div class="card">
+                <h1>Visual Field Test Results</h1>
+
+                <div class="result-metrics">
+                    <div class="metric-card">
+                        <div class="metric-value" id="right-eye-score">-</div>
+                        <div class="metric-label">Right Eye Score</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-value" id="left-eye-score">-</div>
+                        <div class="metric-label">Left Eye Score</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-value" id="reliability-index">-</div>
+                        <div class="metric-label">Reliability Index</div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-value" id="defect-probability">-</div>
+                        <div class="metric-label">Defect Probability</div>
+                    </div>
+                </div>
+
+                <h2>Visual Field Maps</h2>
+                <div class="visual-field-map" id="right-eye-map"></div>
+                <div class="visual-field-map" id="left-eye-map"></div>
+
+                <div class="ai-analysis">
+                    <h3>AI Analysis</h3>
+                    <p id="ai-analysis-text">The test results are being analyzed by our AI system. This may detect
+                        patterns suggestive of glaucoma, neurological conditions, or other visual field defects.</p>
+
+                    <div class="ai-recommendations">
+                        <h4>Recommendations:</h4>
+                        <ul id="ai-recommendations-list">
+                            <li>Loading recommendations...</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button id="view-details-btn" class="btn btn-accent">View Detailed Report</button>
+                    <button id="new-test-btn" class="btn btn-primary">Start New Test</button>
+                    <button id="save-results-btn" class="btn btn-secondary">Save Results</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Professional Visual Field Test | Not a substitute for professional medical advice</p>
+    </footer>
+
+    <script>
+        // Test configurations
+        const testPatterns = {
+            'central-30': {
+                name: 'Central 30°',
+                points: generateTestPoints(30, 6),
+                duration: 300,
+                intensity: 6
+            },
+            'central-60': {
+                name: 'Central 60°',
+                points: generateTestPoints(60, 8),
+                duration: 300,
+                intensity: 5
+            },
+            'full-90': {
+                name: 'Full 90°',
+                points: generateTestPoints(90, 10),
+                duration: 400,
+                intensity: 4
+            },
+            'glaucoma': {
+                name: 'Glaucoma Pattern',
+                points: generateGlaucomaPattern(),
+                duration: 300,
+                intensity: 6
+            },
+            'neurological': {
+                name: 'Neurological Pattern',
+                points: generateNeurologicalPattern(),
+                duration: 400,
+                intensity: 5
+            }
+        };
+
+        // Test state
+        let currentTest = {
+            type: null,
+            pattern: null,
+            eye: 'right', // 'right' or 'left'
+            currentPoint: 0,
+            points: [],
+            responses: [],
+            startTime: null,
+            testConfig: {}
+        };
+
+        // DOM elements
+        const menuScreen = document.getElementById('menu-screen');
+        const instructionsScreen = document.getElementById('instructions-screen');
+        const customTestScreen = document.getElementById('custom-test-screen');
+        const testScreen = document.getElementById('test-screen');
+        const resultsScreen = document.getElementById('results-screen');
+
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+        const centralTestBtn = document.getElementById('central-test-btn');
+        const fullTestBtn = document.getElementById('full-test-btn');
+        const customTestBtn = document.getElementById('custom-test-btn');
+        const startTestBtn = document.getElementById('start-test-btn');
+        const cancelTestBtn = document.getElementById('cancel-test-btn');
+        const startCustomTestBtn = document.getElementById('start-custom-test-btn');
+        const cancelCustomTestBtn = document.getElementById('cancel-custom-test-btn');
+
+        const testEyeSelect = document.getElementById('test-eye');
+        const testPatternSelect = document.getElementById('test-pattern');
+        const testDensitySlider = document.getElementById('test-density');
+        const testDensityValue = document.getElementById('test-density-value');
+        const stimulusDurationSlider = document.getElementById('stimulus-duration');
+        const stimulusDurationValue = document.getElementById('stimulus-duration-value');
+        const stimulusIntensitySlider = document.getElementById('stimulus-intensity');
+        const stimulusIntensityValue = document.getElementById('stimulus-intensity-value');
+
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+        const visualFieldTest = document.getElementById('visual-field-test');
+        const fixationPoint = document.getElementById('fixation-point');
+        const pauseTestBtn = document.getElementById('pause-test-btn');
+        const stopTestBtn = document.getElementById('stop-test-btn');
+
+        const rightEyeScore = document.getElementById('right-eye-score');
+        const leftEyeScore = document.getElementById('left-eye-score');
+        const reliabilityIndex = document.getElementById('reliability-index');
+        const defectProbability = document.getElementById('defect-probability');
+        const rightEyeMap = document.getElementById('right-eye-map');
+        const leftEyeMap = document.getElementById('left-eye-map');
+        const aiAnalysisText = document.getElementById('ai-analysis-text');
+        const aiRecommendationsList = document.getElementById('ai-recommendations-list');
+
+        const viewDetailsBtn = document.getElementById('view-details-btn');
+        const newTestBtn = document.getElementById('new-test-btn');
+        const saveResultsBtn = document.getElementById('save-results-btn');
+
+        // Initialize the application
+        function init() {
+            setupEventListeners();
+            updateSliderValues();
+        }
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Menu buttons
+            centralTestBtn.addEventListener('click', () => prepareTest('central-30'));
+            fullTestBtn.addEventListener('click', () => prepareTest('full-90'));
+            customTestBtn.addEventListener('click', showCustomTestScreen);
+
+            // Instruction screen buttons
+            startTestBtn.addEventListener('click', startTest);
+            cancelTestBtn.addEventListener('click', showMenuScreen);
+
+            // Custom test configuration
+            testDensitySlider.addEventListener('input', updateSliderValues);
+            stimulusDurationSlider.addEventListener('input', updateSliderValues);
+            stimulusIntensitySlider.addEventListener('input', updateSliderValues);
+
+            startCustomTestBtn.addEventListener('click', startCustomTest);
+            cancelCustomTestBtn.addEventListener('click', showMenuScreen);
+
+            // Test screen buttons
+            pauseTestBtn.addEventListener('click', togglePauseTest);
+            stopTestBtn.addEventListener('click', stopTest);
+
+            // Results screen buttons
+            newTestBtn.addEventListener('click', showMenuScreen);
+            viewDetailsBtn.addEventListener('click', viewDetailedReport);
+            saveResultsBtn.addEventListener('click', saveResults);
+
+            // Keyboard and touch events for responding to stimuli
+            document.addEventListener('keydown', handleKeyPress);
+            visualFieldTest.addEventListener('click', handleScreenTap);
+        }
+
+        // Update slider values display
+        function updateSliderValues() {
+            const densityValues = ['Very Low', 'Low', 'Standard', 'High', 'Very High'];
+            testDensityValue.textContent = densityValues[testDensitySlider.value - 1];
+            stimulusDurationValue.textContent = `${stimulusDurationSlider.value}ms`;
+            stimulusIntensityValue.textContent = stimulusIntensitySlider.value;
+        }
+
+        // Show menu screen
+        function showMenuScreen() {
+            hideAllScreens();
+            menuScreen.classList.add('active-screen');
+            backToMenuBtn.style.display = 'none';
+        }
+
+        // Show instructions screen
+        function showInstructionsScreen() {
+            hideAllScreens();
+            instructionsScreen.classList.add('active-screen');
+            backToMenuBtn.style.display = 'inline-block';
+        }
+
+        // Show custom test configuration screen
+        function showCustomTestScreen() {
+            hideAllScreens();
+            customTestScreen.classList.add('active-screen');
+            backToMenuBtn.style.display = 'inline-block';
+        }
+
+        // Show test screen
+        function showTestScreen() {
+            hideAllScreens();
+            testScreen.classList.add('active-screen');
+            backToMenuBtn.style.display = 'inline-block';
+        }
+
+        // Show results screen
+        function showResultsScreen() {
+            hideAllScreens();
+            resultsScreen.classList.add('active-screen');
+            backToMenuBtn.style.display = 'inline-block';
+            displayResults();
+        }
+
+        // Hide all screens
+        function hideAllScreens() {
+            document.querySelectorAll('.menu-screen, .instructions-screen, .test-screen, .results-screen').forEach(screen => {
+                screen.classList.remove('active-screen');
+            });
+        }
+
+        // Prepare test (show instructions)
+        function prepareTest(pattern) {
+            currentTest.type = 'standard';
+            currentTest.pattern = pattern;
+            currentTest.testConfig = { ...testPatterns[pattern] };
+
+            // Set eye to test first
+            currentTest.eye = testEyeSelect.value;
+
+            showInstructionsScreen();
+        }
+
+        // Start custom test
+        function startCustomTest() {
+            currentTest.type = 'custom';
+            currentTest.pattern = testPatternSelect.value;
+
+            // Get custom configuration
+            currentTest.testConfig = {
+                ...testPatterns[testPatternSelect.value],
+                duration: parseInt(stimulusDurationSlider.value),
+                intensity: parseInt(stimulusIntensitySlider.value)
+            };
+
+            // Adjust point density based on slider
+            if (testDensitySlider.value != 3) {
+                const densityFactor = testDensitySlider.value / 3; // 3 is "standard"
+                currentTest.testConfig.points = currentTest.testConfig.points.map(point => {
+                    return {
+                        ...point,
+                        // Reduce radius for higher density, increase for lower
+                        radius: point.radius * (testDensitySlider.value > 3 ? 0.9 : 1.1)
+                    };
+                });
+            }
+
+            // Set eye to test first
+            currentTest.eye = 'right'; // Always start with right eye for custom tests
+
+            startTest();
+        }
+
+        // Start the test
+        function startTest() {
+            // Initialize test state
+            currentTest.currentPoint = 0;
+            currentTest.responses = [];
+            currentTest.startTime = new Date();
+
+            // Set points for the first eye
+            currentTest.points = [...currentTest.testConfig.points];
+
+            // Shuffle points to randomize order
+            shuffleArray(currentTest.points);
+
+            showTestScreen();
+            startNextPoint();
+        }
+
+        // Start next test point
+        function startNextPoint() {
+            // Update progress
+            const progress = (currentTest.currentPoint / currentTest.points.length) * 100;
+            progressFill.style.width = `${progress}%`;
+            progressText.textContent = `Point ${currentTest.currentPoint + 1} of ${currentTest.points.length} | ${currentTest.eye === 'right' ? 'Right' : 'Left'} Eye`;
+
+            // Clear any existing stimuli
+            clearStimuli();
+
+            if (currentTest.currentPoint >= currentTest.points.length) {
+                // Test complete for this eye
+                if (currentTest.eye === 'right' && currentTest.type !== 'custom') {
+                    // Switch to left eye
+                    currentTest.eye = 'left';
+                    currentTest.currentPoint = 0;
+                    currentTest.points = [...currentTest.testConfig.points];
+                    shuffleArray(currentTest.points);
+
+                    // Show instruction to switch eyes
+                    progressText.textContent = 'Please cover your right eye and focus on the center dot';
+                    setTimeout(startNextPoint, 3000);
+                } else {
+                    // Test complete for both eyes
+                    completeTest();
+                }
+                return;
+            }
+
+            const point = currentTest.points[currentTest.currentPoint];
+
+            // Create stimulus
+            const stimulus = document.createElement('div');
+            stimulus.className = 'test-stimulus';
+            stimulus.style.width = `${point.size}px`;
+            stimulus.style.height = `${point.size}px`;
+            stimulus.style.left = `${50 + point.x}%`;
+            stimulus.style.top = `${50 + point.y}%`;
+            stimulus.style.backgroundColor = `rgba(255, 255, 255, ${currentTest.testConfig.intensity / 10})`;
+            stimulus.dataset.pointIndex = currentTest.currentPoint;
+            visualFieldTest.appendChild(stimulus);
+
+            // Show stimulus after random delay (1-3 seconds)
+            const delay = 1000 + Math.random() * 2000;
+            setTimeout(() => {
+                stimulus.classList.add('visible');
+
+                // Record the time the stimulus was shown
+                currentTest.points[currentTest.currentPoint].shownAt = new Date();
+
+                // Hide stimulus after configured duration
+                setTimeout(() => {
+                    stimulus.classList.remove('visible');
+
+                    // If no response was recorded, mark as missed
+                    if (!currentTest.responses[currentTest.currentPoint]) {
+                        currentTest.responses[currentTest.currentPoint] = {
+                            responded: false,
+                            reactionTime: null,
+                            eye: currentTest.eye
+                        };
+
+                        // Move to next point after brief pause
+                        setTimeout(() => {
+                            currentTest.currentPoint++;
+                            startNextPoint();
+                        }, 500);
+                    }
+                }, currentTest.testConfig.duration);
+            }, delay);
+        }
+
+        // Clear all stimuli from the test area
+        function clearStimuli() {
+            const stimuli = document.querySelectorAll('.test-stimulus');
+            stimuli.forEach(stimulus => stimulus.remove());
+        }
+
+        // Handle key press (spacebar to respond)
+        function handleKeyPress(e) {
+            if (e.key === ' ' && testScreen.classList.contains('active-screen')) {
+                recordResponse();
+            }
+        }
+
+        // Handle screen tap (for mobile/touch devices)
+        function handleScreenTap() {
+            if (testScreen.classList.contains('active-screen')) {
+                recordResponse();
+            }
+        }
+
+        // Record user response to stimulus
+        function recordResponse() {
+            // Only record if we're in the test screen and there's an active stimulus
+            if (!testScreen.classList.contains('active-screen') || currentTest.currentPoint >= currentTest.points.length) {
+                return;
+            }
+
+            // Check if we already recorded a response for this point
+            if (currentTest.responses[currentTest.currentPoint]) {
+                return;
+            }
+
+            // Find the currently visible stimulus
+            const visibleStimulus = document.querySelector('.test-stimulus.visible');
+            if (!visibleStimulus) {
+                return;
+            }
+
+            // Calculate reaction time
+            const pointIndex = parseInt(visibleStimulus.dataset.pointIndex);
+            const shownAt = currentTest.points[pointIndex].shownAt;
+            const reactionTime = new Date() - shownAt;
+
+            // Record response
+            currentTest.responses[pointIndex] = {
+                responded: true,
+                reactionTime: reactionTime,
+                eye: currentTest.eye
+            };
+
+            // Hide stimulus immediately
+            visibleStimulus.classList.remove('visible');
+
+            // Move to next point after brief pause
+            setTimeout(() => {
+                currentTest.currentPoint++;
+                startNextPoint();
+            }, 500);
+        }
+
+        // Toggle pause test
+        function togglePauseTest() {
+            // Implementation would track pause state and timers
+            alert('Pause functionality would be implemented in a full version');
+        }
+
+        // Stop test early
+        function stopTest() {
+            if (confirm('Are you sure you want to stop the test? Partial results will be saved.')) {
+                completeTest();
+            }
+        }
+
+        // Complete the test and show results
+        function completeTest() {
+            showResultsScreen();
+        }
+
+        // Display results
+        function displayResults() {
+            // Process results for each eye
+            const rightEyeResults = processEyeResults('right');
+            const leftEyeResults = processEyeResults('left');
+
+            // Calculate overall metrics
+            const reliability = calculateReliabilityIndex(rightEyeResults, leftEyeResults);
+            const defectProb = calculateDefectProbability(rightEyeResults, leftEyeResults);
+
+            // Update UI
+            rightEyeScore.textContent = rightEyeResults.score;
+            leftEyeScore.textContent = leftEyeResults.score;
+            reliabilityIndex.textContent = `${reliability}%`;
+            defectProbability.textContent = `${defectProb}%`;
+
+            // Generate visual field maps
+            generateVisualFieldMap(rightEyeMap, 'right', rightEyeResults);
+            generateVisualFieldMap(leftEyeMap, 'left', leftEyeResults);
+
+            // Generate AI analysis
+            generateAIAnalysis(rightEyeResults, leftEyeResults, reliability, defectProb);
+        }
+
+        // Process results for one eye
+        function processEyeResults(eye) {
+            const eyeResponses = currentTest.responses
+                .filter((response, index) => response && response.eye === eye)
+                .map((response, index) => {
+                    const point = currentTest.points[index];
+                    return {
+                        ...response,
+                        ...point
+                    };
+                });
+
+            // Calculate detection rate
+            const detected = eyeResponses.filter(r => r.responded).length;
+            const detectionRate = (detected / eyeResponses.length) * 100;
+
+            // Calculate average reaction time (only for detected stimuli)
+            const detectedResponses = eyeResponses.filter(r => r.responded && r.reactionTime);
+            const avgReactionTime = detectedResponses.length > 0
+                ? detectedResponses.reduce((sum, r) => sum + r.reactionTime, 0) / detectedResponses.length
+                : 0;
+
+            // Calculate score (0-100)
+            const score = Math.min(100, Math.round(
+                detectionRate * 0.7 + // Detection rate is most important
+                (100 - (avgReactionTime / 1000)) * 0.3 // Faster responses are better
+            ));
+
+            return {
+                eye,
+                detectionRate,
+                avgReactionTime,
+                score,
+                responses: eyeResponses
+            };
+        }
+
+        // Calculate reliability index
+        function calculateReliabilityIndex(rightEyeResults, leftEyeResults) {
+            // This would consider fixation losses, false positives, false negatives
+            // For simplicity, we'll base it on response consistency
+            const rightConsistency = calculateResponseConsistency(rightEyeResults);
+            const leftConsistency = calculateResponseConsistency(leftEyeResults);
+
+            return Math.round((rightConsistency + leftConsistency) / 2);
+        }
+
+        // Calculate response consistency
+        function calculateResponseConsistency(eyeResults) {
+            // This would normally compare responses to similar stimuli
+            // For simplicity, we'll base it on reaction time consistency
+            if (eyeResults.responses.length === 0) return 100;
+
+            const reactionTimes = eyeResults.responses
+                .filter(r => r.responded && r.reactionTime)
+                .map(r => r.reactionTime);
+
+            if (reactionTimes.length < 2) return 100;
+
+            const avg = reactionTimes.reduce((sum, t) => sum + t, 0) / reactionTimes.length;
+            const variance = reactionTimes.reduce((sum, t) => sum + Math.pow(t - avg, 2), 0) / reactionTimes.length;
+            const stdDev = Math.sqrt(variance);
+
+            // Convert to reliability percentage (lower stdDev = higher reliability)
+            return Math.max(0, 100 - (stdDev / 50));
+        }
+
+        // Calculate defect probability
+        function calculateDefectProbability(rightEyeResults, leftEyeResults) {
+            // This would analyze patterns of missed stimuli
+            // For simplicity, we'll base it on detection rate and spatial patterns
+
+            // Lower detection rate increases probability
+            let prob = (100 - (rightEyeResults.detectionRate + leftEyeResults.detectionRate) / 2) * 0.7;
+
+            // Check for hemifield defects (common in neurological conditions)
+            if (hasHemifieldDefect(rightEyeResults) || hasHemifieldDefect(leftEyeResults)) {
+                prob += 20;
+            }
+
+            // Check for arcuate defects (common in glaucoma)
+            if (hasArcuateDefect(rightEyeResults) || hasArcuateDefect(leftEyeResults)) {
+                prob += 15;
+            }
+
+            return Math.min(100, Math.round(prob));
+        }
+
+        // Check for hemifield defect
+        function hasHemifieldDefect(eyeResults) {
+            // Count missed stimuli in each hemifield
+            const leftMissed = eyeResults.responses.filter(r => !r.responded && r.x < 0).length;
+            const rightMissed = eyeResults.responses.filter(r => !r.responded && r.x >= 0).length;
+
+            // Significant difference suggests hemifield defect
+            return Math.abs(leftMissed - rightMissed) > (eyeResults.responses.length * 0.2);
+        }
+
+        // Check for arcuate defect
+        function hasArcuateDefect(eyeResults) {
+            // Count missed stimuli in arcuate areas (superior and inferior)
+            const superiorMissed = eyeResults.responses.filter(r =>
+                !r.responded && r.y < 0 && Math.abs(r.x) < Math.abs(r.y)
+            ).length;
+
+            const inferiorMissed = eyeResults.responses.filter(r =>
+                !r.responded && r.y > 0 && Math.abs(r.x) < Math.abs(r.y)
+            ).length;
+
+            // Cluster of missed points in arcuate areas
+            return (superiorMissed > 3 || inferiorMissed > 3);
+        }
+
+        // Generate visual field map
+        function generateVisualFieldMap(container, eye, results) {
+            container.innerHTML = '';
+
+            // Add title
+            const title = document.createElement('h3');
+            title.textContent = `${eye === 'right' ? 'Right' : 'Left'} Eye Visual Field`;
+            title.style.textAlign = 'center';
+            title.style.marginBottom = '1rem';
+            container.appendChild(title);
+
+            // Create points based on results
+            results.responses.forEach(response => {
+                const point = document.createElement('div');
+                point.className = 'visual-field-point';
+
+                // Position point (convert from % to px coordinates)
+                const x = 50 + (response.x * 0.5); // Scale down for display
+                const y = 50 + (response.y * 0.5);
+                point.style.left = `${x}%`;
+                point.style.top = `${y}%`;
+
+                // Color based on response
+                if (response.responded) {
+                    // Green for detected, darker for faster responses
+                    const speedFactor = response.reactionTime ? Math.min(1, response.reactionTime / 1000) : 1;
+                    const intensity = Math.floor(200 + (55 * speedFactor));
+                    point.style.backgroundColor = `rgb(0, ${intensity}, 0)`;
+                } else {
+                    // Red for missed
+                    point.style.backgroundColor = 'rgb(200, 0, 0)';
+                }
+
+                // Size based on original stimulus size
+                point.style.width = `${Math.max(6, response.size * 0.5)}px`;
+                point.style.height = `${Math.max(6, response.size * 0.5)}px`;
+
+                container.appendChild(point);
+            });
+        }
+
+        // Generate AI analysis
+        function generateAIAnalysis(rightEyeResults, leftEyeResults, reliability, defectProb) {
+            let analysis = '';
+            let recommendations = [];
+
+            // Basic analysis based on scores
+            const avgScore = (rightEyeResults.score + leftEyeResults.score) / 2;
+
+            if (avgScore >= 90 && reliability >= 85) {
+                analysis = 'Your visual field test results appear normal with excellent detection rates and consistent responses. No significant visual field defects were detected.';
+            } else if (avgScore >= 75 && reliability >= 70) {
+                analysis = 'Your visual field test shows generally normal results with a few areas of slightly reduced sensitivity. This may be normal variation or suggest early changes.';
+            } else if (avgScore >= 50 || defectProb >= 30) {
+                analysis = 'Your test results show some areas of reduced sensitivity that may indicate visual field defects. The pattern suggests ';
+
+                // Add pattern-specific information
+                if (hasHemifieldDefect(rightEyeResults) || hasHemifieldDefect(leftEyeResults)) {
+                    analysis += 'a hemifield defect, which can be associated with neurological conditions. ';
+                } else if (hasArcuateDefect(rightEyeResults) || hasArcuateDefect(leftEyeResults)) {
+                    analysis += 'an arcuate defect, which can be associated with glaucoma. ';
+                } else {
+                    analysis += 'non-specific visual field loss. ';
+                }
+            } else {
+                analysis = 'Your test results show significant visual field defects that should be evaluated by an eye care professional. ';
+            }
+
+            // Add reliability note
+            if (reliability < 70) {
+                analysis += ' The test reliability was somewhat low, which may affect result accuracy. ';
+            }
+
+            // Generate recommendations
+            if (defectProb >= 50) {
+                recommendations.push(
+                    'Schedule a comprehensive eye examination with an ophthalmologist',
+                    'Consider additional testing such as optical coherence tomography (OCT)',
+                    'Monitor for symptoms like vision loss or difficulty with peripheral vision'
+                );
+            } else if (defectProb >= 30) {
+                recommendations.push(
+                    'Consider a follow-up visual field test in 3-6 months',
+                    'Schedule an eye exam if you haven\'t had one in the past year',
+                    'Protect your eyes from UV exposure and maintain healthy blood pressure'
+                );
+            } else {
+                recommendations.push(
+                    'Continue regular eye exams as recommended for your age',
+                    'Maintain a healthy lifestyle to support eye health',
+                    'Repeat this test annually or if you notice vision changes'
+                );
+            }
+
+            // Add general recommendations
+            recommendations.push(
+                'Ensure proper lighting when reading or performing visually demanding tasks',
+                'Be aware of your peripheral vision when driving or moving in crowded areas'
+            );
+
+            // Update UI
+            aiAnalysisText.textContent = analysis;
+            aiRecommendationsList.innerHTML = '';
+
+            recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.textContent = rec;
+                aiRecommendationsList.appendChild(li);
+            });
+        }
+
+        // View detailed report
+        function viewDetailedReport() {
+            alert('Detailed report would show a full breakdown of responses at each test location, statistical analysis, and comparison to age-matched norms in a full implementation.');
+        }
+
+        // Save results
+        function saveResults() {
+            alert('Results would be saved to your account or downloaded as a PDF in a full implementation. Data could include: ' +
+                'Raw response data, visual field maps, AI analysis, and recommendations.');
+        }
+
+        // Generate test points for a visual field pattern
+        function generateTestPoints(degrees, rings) {
+            const points = [];
+            const centerSize = 5; // Size of central stimulus
+
+            // Add central point
+            points.push({
+                x: 0,
+                y: 0,
+                size: centerSize,
+                radius: 0
+            });
+
+            // Generate rings of points
+            for (let r = 1; r <= rings; r++) {
+                const radius = (r / rings) * (degrees / 90); // Normalized radius
+                const circumference = 2 * Math.PI * radius;
+                const spacing = 0.15; // Normalized spacing between points
+                const numPoints = Math.max(4, Math.floor(circumference / spacing));
+
+                // Size decreases with eccentricity
+                const size = Math.max(2, centerSize * (1 - (r / (rings * 1.5))));
+
+                for (let i = 0; i < numPoints; i++) {
+                    const angle = (i / numPoints) * 2 * Math.PI;
+                    const x = radius * Math.cos(angle);
+                    const y = radius * Math.sin(angle);
+
+                    points.push({
+                        x,
+                        y,
+                        size,
+                        radius
+                    });
+                }
+            }
+
+            return points;
+        }
+
+        // Generate glaucoma test pattern (focus on arcuate areas)
+        function generateGlaucomaPattern() {
+            const points = [];
+            const centerSize = 5;
+
+            // Central points
+            points.push({ x: 0, y: 0, size: centerSize, radius: 0 });
+
+            // Dense points in arcuate areas (superior and inferior)
+            for (let r = 1; r <= 5; r++) {
+                const radius = r * 0.1;
+                const size = Math.max(2, centerSize * (1 - (r / 7.5)));
+
+                // Superior points
+                for (let a = Math.PI / 4; a < 3 * Math.PI / 4; a += Math.PI / 8) {
+                    points.push({
+                        x: radius * Math.cos(a),
+                        y: radius * Math.sin(a),
+                        size,
+                        radius
+                    });
+                }
+
+                // Inferior points
+                for (let a = 5 * Math.PI / 4; a < 7 * Math.PI / 4; a += Math.PI / 8) {
+                    points.push({
+                        x: radius * Math.cos(a),
+                        y: radius * Math.sin(a),
+                        size,
+                        radius
+                    });
+                }
+            }
+
+            return points;
+        }
+
+        // Generate neurological test pattern (focus on hemifields)
+        function generateNeurologicalPattern() {
+            const points = [];
+            const centerSize = 5;
+
+            // Central points
+            points.push({ x: 0, y: 0, size: centerSize, radius: 0 });
+
+            // Dense points in hemifields
+            for (let r = 1; r <= 6; r++) {
+                const radius = r * 0.12;
+                const size = Math.max(2, centerSize * (1 - (r / 9)));
+
+                // Left hemifield
+                for (let a = Math.PI / 2; a < 3 * Math.PI / 2; a += Math.PI / 6) {
+                    points.push({
+                        x: radius * Math.cos(a),
+                        y: radius * Math.sin(a),
+                        size,
+                        radius
+                    });
+                }
+
+                // Right hemifield
+                for (let a = -Math.PI / 2; a < Math.PI / 2; a += Math.PI / 6) {
+                    points.push({
+                        x: radius * Math.cos(a),
+                        y: radius * Math.sin(a),
+                        size,
+                        radius
+                    });
+                }
+            }
+
+            return points;
+        }
+
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Vision Acuity Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f94144;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            font-size: 1.1rem;
+        }
+
+        .eye-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .eye-btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+            flex: 1;
+            max-width: 200px;
+            border: 2px solid var(--light-gray);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .eye-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .eye-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .snellen-chart {
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            margin: 30px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 400px;
+            justify-content: center;
+        }
+
+        .snellen-row {
+            margin: 12px 0;
+            display: flex;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .snellen-char {
+            margin: 0 8px;
+            display: inline-block;
+            opacity: 0.2;
+            transition: all 0.3s;
+            color: var(--dark);
+        }
+
+        .snellen-char.active {
+            opacity: 1;
+            transform: scale(1.1);
+            color: var(--primary);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light);
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn:disabled {
+            background-color: var(--light-gray);
+            color: var(--gray);
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .results-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .eye-result {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .eye-result h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .acuity-score {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: var(--dark);
+        }
+
+        .result-details {
+            text-align: left;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .result-details p {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .result-details span {
+            font-weight: 600;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .test-instruction {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .interpretation {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .interpretation h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .timer {
+            background: var(--primary);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .distance-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .distance-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            border: 2px solid var(--light-gray);
+            background: white;
+        }
+
+        .distance-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .results-container {
+                flex-direction: column;
+            }
+
+            .eye-selector,
+            .controls,
+            .distance-selector {
+                flex-wrap: wrap;
+            }
+
+            .eye-btn,
+            .distance-btn {
+                min-width: 120px;
+            }
+
+            .snellen-char {
+                margin: 0 4px;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s forwards;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1><i class="fas fa-eye"></i> Vision Acuity Test</h1>
+                <p>Professional-grade visual acuity assessment</p>
+            </div>
+            <button id="backToMenuBtn" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Menu
+            </button>
+        </div>
+
+        <div class="card fade-in" id="testCard">
+            <h2 class="card-title"><i class="fas fa-chart-line"></i> Snellen Chart Test</h2>
+
+            <div class="distance-selector">
+                <button id="distanceBtn" class="distance-btn active">
+                    <i class="fas fa-arrows-alt-h"></i> Distance Vision
+                </button>
+                <button id="nearBtn" class="distance-btn">
+                    <i class="fas fa-search"></i> Near Vision
+                </button>
+            </div>
+
+            <div class="eye-selector">
+                <button id="rightEyeBtn" class="eye-btn active">
+                    <i class="fas fa-eye"></i> Right Eye
+                </button>
+                <button id="leftEyeBtn" class="eye-btn">
+                    <i class="fas fa-eye"></i> Left Eye
+                </button>
+            </div>
+
+            <div class="test-instruction">
+                Cover your <span id="coverEyeText">left</span> eye and read the highlighted letters aloud
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <div id="snellenChart" class="snellen-chart"></div>
+
+            <div class="controls">
+                <button id="startBtn" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Start Test
+                </button>
+                <button id="pauseBtn" class="btn btn-warning" disabled>
+                    <i class="fas fa-pause"></i> Pause
+                </button>
+                <button id="stopBtn" class="btn btn-danger" disabled>
+                    <i class="fas fa-stop"></i> Stop
+                </button>
+            </div>
+        </div>
+
+        <div class="card fade-in" id="resultsCard" style="display: none;">
+            <h2 class="card-title"><i class="fas fa-clipboard-check"></i> Test Results</h2>
+
+            <div class="results-container">
+                <div class="eye-result">
+                    <h3><i class="fas fa-eye"></i> Right Eye</h3>
+                    <div class="acuity-score" id="rightEyeResult">-</div>
+                    <div class="result-details">
+                        <p>Test Type: <span id="rightTestType">-</span></p>
+                        <p>Visual Acuity: <span id="rightAcuity">-</span></p>
+                        <p>Test Time: <span id="rightTestTime">-</span></p>
+                        <p>Accuracy: <span id="rightAccuracy">-</span></p>
+                    </div>
+                </div>
+                <div class="eye-result">
+                    <h3><i class="fas fa-eye"></i> Left Eye</h3>
+                    <div class="acuity-score" id="leftEyeResult">-</div>
+                    <div class="result-details">
+                        <p>Test Type: <span id="leftTestType">-</span></p>
+                        <p>Visual Acuity: <span id="leftAcuity">-</span></p>
+                        <p>Test Time: <span id="leftTestTime">-</span></p>
+                        <p>Accuracy: <span id="leftAccuracy">-</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interpretation">
+                <h3><i class="fas fa-info-circle"></i> Interpretation</h3>
+                <p id="resultInterpretation">Complete the test to see your vision assessment.</p>
+            </div>
+
+            <div class="controls">
+                <button id="newTestBtn" class="btn btn-primary">
+                    <i class="fas fa-redo"></i> New Test
+                </button>
+                <button id="saveResultsBtn" class="btn btn-secondary">
+                    <i class="fas fa-save"></i> Save Results
+                </button>
+                <button id="backToTestBtn" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Test
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Snellen chart configurations for distance and near vision
+        const testConfigs = {
+            distance: {
+                rows: [
+                    { size: 100, letters: ['E'], acuity: '20/200' },
+                    { size: 80, letters: ['F', 'P'], acuity: '20/100' },
+                    { size: 60, letters: ['T', 'O', 'Z'], acuity: '20/70' },
+                    { size: 50, letters: ['L', 'P', 'E', 'D'], acuity: '20/50' },
+                    { size: 40, letters: ['P', 'E', 'C', 'F', 'D'], acuity: '20/40' },
+                    { size: 30, letters: ['E', 'D', 'F', 'C', 'Z', 'P'], acuity: '20/30' },
+                    { size: 20, letters: ['F', 'E', 'L', 'O', 'P', 'Z', 'D'], acuity: '20/25' },
+                    { size: 15, letters: ['D', 'E', 'F', 'P', 'O', 'T', 'E', 'C'], acuity: '20/20' }
+                ],
+                instruction: "Stand 20 feet from the screen and cover your "
+            },
+            near: {
+                rows: [
+                    { size: 60, letters: ['E'], acuity: 'N8' },
+                    { size: 50, letters: ['F', 'P'], acuity: 'N10' },
+                    { size: 40, letters: ['T', 'O', 'Z'], acuity: 'N12' },
+                    { size: 30, letters: ['L', 'P', 'E', 'D'], acuity: 'N14' },
+                    { size: 25, letters: ['P', 'E', 'C', 'F', 'D'], acuity: 'N18' },
+                    { size: 20, letters: ['E', 'D', 'F', 'C', 'Z', 'P'], acuity: 'N24' },
+                    { size: 15, letters: ['F', 'E', 'L', 'O', 'P', 'Z', 'D'], acuity: 'N36' },
+                    { size: 12, letters: ['D', 'E', 'F', 'P', 'O', 'T', 'E', 'C'], acuity: 'N48' }
+                ],
+                instruction: "Hold the device 14 inches away and cover your "
+            }
+        };
+
+        // DOM elements
+        const testCard = document.getElementById('testCard');
+        const resultsCard = document.getElementById('resultsCard');
+        const snellenContainer = document.getElementById('snellenChart');
+        const rightEyeBtn = document.getElementById('rightEyeBtn');
+        const leftEyeBtn = document.getElementById('leftEyeBtn');
+        const distanceBtn = document.getElementById('distanceBtn');
+        const nearBtn = document.getElementById('nearBtn');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const newTestBtn = document.getElementById('newTestBtn');
+        const saveResultsBtn = document.getElementById('saveResultsBtn');
+        const backToTestBtn = document.getElementById('backToTestBtn');
+        const backToMenuBtn = document.getElementById('backToMenuBtn');
+        const coverEyeText = document.getElementById('coverEyeText');
+        const progressBar = document.getElementById('progressBar');
+
+        // Results elements
+        const rightEyeResult = document.getElementById('rightEyeResult');
+        const leftEyeResult = document.getElementById('leftEyeResult');
+        const rightAcuity = document.getElementById('rightAcuity');
+        const leftAcuity = document.getElementById('leftAcuity');
+        const rightTestType = document.getElementById('rightTestType');
+        const leftTestType = document.getElementById('leftTestType');
+        const rightTestTime = document.getElementById('rightTestTime');
+        const leftTestTime = document.getElementById('leftTestTime');
+        const rightAccuracy = document.getElementById('rightAccuracy');
+        const leftAccuracy = document.getElementById('leftAccuracy');
+        const resultInterpretation = document.getElementById('resultInterpretation');
+
+        // Test variables
+        let currentEye = 'right';
+        let testType = 'distance';
+        let currentRow = 0;
+        let currentChar = 0;
+        let testInterval;
+        let testRunning = false;
+        let testPaused = false;
+        let startTime;
+        let elapsedTime = 0;
+        let timerInterval;
+
+        let testResults = {
+            right: {
+                distance: { score: null, time: null, correct: 0, total: 0 },
+                near: { score: null, time: null, correct: 0, total: 0 }
+            },
+            left: {
+                distance: { score: null, time: null, correct: 0, total: 0 },
+                near: { score: null, time: null, correct: 0, total: 0 }
+            }
+        };
+
+        // Initialize the Snellen chart
+        function initSnellenChart() {
+            snellenContainer.innerHTML = '';
+            const config = testConfigs[testType];
+
+            config.rows.forEach(row => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'snellen-row';
+                rowDiv.style.fontSize = `${row.size}px`;
+                rowDiv.dataset.acuity = row.acuity;
+
+                row.letters.forEach((letter, index) => {
+                    const charSpan = document.createElement('span');
+                    charSpan.className = 'snellen-char';
+                    charSpan.textContent = letter;
+                    charSpan.dataset.correct = letter;
+                    rowDiv.appendChild(charSpan);
+                });
+
+                snellenContainer.appendChild(rowDiv);
+            });
+
+            // Update instruction text
+            coverEyeText.textContent = currentEye === 'right' ? 'left' : 'right';
+        }
+
+        // Start the vision test
+        function startTest() {
+            if (testRunning) return;
+
+            testRunning = true;
+            testPaused = false;
+            currentRow = 0;
+            currentChar = 0;
+            elapsedTime = 0;
+
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            stopBtn.disabled = false;
+            rightEyeBtn.disabled = true;
+            leftEyeBtn.disabled = true;
+            distanceBtn.disabled = true;
+            nearBtn.disabled = true;
+
+            // Start timer
+            startTime = Date.now();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+
+            showNextCharacter();
+        }
+
+        // Show the next character in the current row
+        function showNextCharacter() {
+            const rows = document.querySelectorAll('.snellen-row');
+            if (currentRow >= rows.length) {
+                completeTest();
+                return;
+            }
+
+            const chars = rows[currentRow].querySelectorAll('.snellen-char');
+            if (currentChar >= chars.length) {
+                // Move to next row
+                currentRow++;
+                currentChar = 0;
+
+                if (currentRow >= rows.length) {
+                    completeTest();
+                    return;
+                }
+
+                // Update the chars reference for the new row
+                return showNextCharacter();
+            }
+
+            // Reset all characters in current row
+            chars.forEach(char => char.classList.remove('active'));
+
+            // Highlight current character
+            chars[currentChar].classList.add('active');
+
+            // Update progress
+            const progress = ((currentRow + (currentChar / chars.length)) / rows.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Set timeout for next character
+            clearTimeout(testInterval);
+            testInterval = setTimeout(() => {
+                currentChar++;
+                showNextCharacter();
+            }, 2000); // 2 seconds per character
+        }
+
+        // Update timer display
+        function updateTimer() {
+            elapsedTime = Date.now() - startTime;
+            const minutes = Math.floor(elapsedTime / 60000);
+            const seconds = Math.floor((elapsedTime % 60000) / 1000);
+
+            // Update the pause button text with time
+            pauseBtn.innerHTML = `<i class="fas fa-pause"></i> Pause (${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')})`;
+        }
+
+        // Pause the test
+        function pauseTest() {
+            if (!testRunning) return;
+
+            if (testPaused) {
+                // Resume
+                testPaused = false;
+                pauseBtn.innerHTML = `<i class="fas fa-pause"></i> Pause`;
+                startTime = Date.now() - elapsedTime;
+                timerInterval = setInterval(updateTimer, 1000);
+                showNextCharacter();
+            } else {
+                // Pause
+                testPaused = true;
+                pauseBtn.innerHTML = `<i class="fas fa-play"></i> Resume`;
+                clearInterval(timerInterval);
+                clearTimeout(testInterval);
+            }
+        }
+
+        // Stop the test
+        function stopTest() {
+            clearInterval(timerInterval);
+            clearTimeout(testInterval);
+            testRunning = false;
+            testPaused = false;
+
+            // Record results up to the current row
+            if (currentRow > 0) {
+                const rows = document.querySelectorAll('.snellen-row');
+                const acuity = rows[Math.min(currentRow - 1, rows.length - 1)].dataset.acuity;
+
+                testResults[currentEye][testType].score = acuity;
+                testResults[currentEye][testType].time = formatTime(elapsedTime);
+            }
+
+            resetTestUI();
+            showResults();
+        }
+
+        // Complete the test
+        function completeTest() {
+            const rows = document.querySelectorAll('.snellen-row');
+            const acuity = rows[Math.min(currentRow, rows.length - 1)].dataset.acuity;
+
+            testResults[currentEye][testType].score = acuity;
+            testResults[currentEye][testType].time = formatTime(elapsedTime);
+
+            clearInterval(timerInterval);
+            resetTestUI();
+            showResults();
+        }
+
+        // Format time as MM:SS
+        function formatTime(ms) {
+            const minutes = Math.floor(ms / 60000);
+            const seconds = Math.floor((ms % 60000) / 1000);
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Reset test UI elements
+        function resetTestUI() {
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            stopBtn.disabled = true;
+            rightEyeBtn.disabled = false;
+            leftEyeBtn.disabled = false;
+            distanceBtn.disabled = false;
+            nearBtn.disabled = false;
+
+            // Reset progress bar
+            progressBar.style.width = '0%';
+
+            // Reset all active characters
+            document.querySelectorAll('.snellen-char.active').forEach(char => {
+                char.classList.remove('active');
+            });
+        }
+
+        // Show results screen
+        function showResults() {
+            // Update results display
+            const rightResult = testResults.right[testType].score || '-';
+            const leftResult = testResults.left[testType].score || '-';
+
+            rightEyeResult.textContent = rightResult;
+            leftEyeResult.textContent = leftResult;
+
+            rightAcuity.textContent = rightResult;
+            leftAcuity.textContent = leftResult;
+
+            rightTestType.textContent = testType === 'distance' ? 'Distance' : 'Near';
+            leftTestType.textContent = testType === 'distance' ? 'Distance' : 'Near';
+
+            rightTestTime.textContent = testResults.right[testType].time || '-';
+            leftTestTime.textContent = testResults.left[testType].time || '-';
+
+            // Calculate accuracy (simplified for demo)
+            const rightAccuracyVal = testResults.right[testType].total > 0
+                ? Math.round((testResults.right[testType].correct / testResults.right[testType].total) * 100)
+                : 0;
+            const leftAccuracyVal = testResults.left[testType].total > 0
+                ? Math.round((testResults.left[testType].correct / testResults.left[testType].total) * 100)
+                : 0;
+
+            rightAccuracy.textContent = rightAccuracyVal > 0 ? `${rightAccuracyVal}%` : '-';
+            leftAccuracy.textContent = leftAccuracyVal > 0 ? `${leftAccuracyVal}%` : '-';
+
+            // Provide interpretation
+            updateInterpretation();
+
+            // Switch to results card
+            testCard.style.display = 'none';
+            resultsCard.style.display = 'block';
+        }
+
+        // Update interpretation text
+        function updateInterpretation() {
+            const rightScore = testResults.right[testType].score;
+            const leftScore = testResults.left[testType].score;
+
+            if (!rightScore && !leftScore) {
+                resultInterpretation.textContent = "Complete the test to see your vision assessment.";
+                return;
+            }
+
+            let interpretation = "";
+
+            if (testType === 'distance') {
+                if (rightScore === '20/20' && leftScore === '20/20') {
+                    interpretation = "Your distance vision appears to be normal in both eyes (20/20).";
+                } else if ((rightScore && rightScore !== '20/20') || (leftScore && leftScore !== '20/20')) {
+                    interpretation = "Your distance vision shows some impairment. ";
+
+                    if (rightScore && rightScore !== '20/20') {
+                        interpretation += `Right eye: ${rightScore}. `;
+                    }
+                    if (leftScore && leftScore !== '20/20') {
+                        interpretation += `Left eye: ${leftScore}. `;
+                    }
+
+                    interpretation += "Consider consulting an eye care professional.";
+                }
+            } else { // Near vision
+                if (rightScore === 'N8' && leftScore === 'N8') {
+                    interpretation = "Your near vision appears to be excellent in both eyes (N8).";
+                } else {
+                    interpretation = "Your near vision assessment: ";
+
+                    if (rightScore) {
+                        interpretation += `Right eye: ${rightScore}. `;
+                    }
+                    if (leftScore) {
+                        interpretation += `Left eye: ${leftScore}. `;
+                    }
+
+                    interpretation += "N8 is considered normal for near vision.";
+                }
+            }
+
+            resultInterpretation.textContent = interpretation;
+        }
+
+        // Switch between testing left and right eyes
+        function switchEye(eye) {
+            if (eye === currentEye || testRunning) return;
+
+            currentEye = eye;
+            rightEyeBtn.classList.toggle('active', eye === 'right');
+            leftEyeBtn.classList.toggle('active', eye === 'left');
+
+            // Update instruction text
+            coverEyeText.textContent = eye === 'right' ? 'left' : 'right';
+
+            // Reset the chart display
+            initSnellenChart();
+        }
+
+        // Switch between distance and near vision tests
+        function switchTestType(type) {
+            if (type === testType || testRunning) return;
+
+            testType = type;
+            distanceBtn.classList.toggle('active', type === 'distance');
+            nearBtn.classList.toggle('active', type === 'near');
+
+            // Update instruction text
+            coverEyeText.textContent = currentEye === 'right' ? 'left' : 'right';
+
+            // Reset the chart display
+            initSnellenChart();
+        }
+
+        // Back to test from results
+        function backToTest() {
+            resultsCard.style.display = 'none';
+            testCard.style.display = 'block';
+        }
+
+        // Reset the entire test
+        function resetTest() {
+            testResults = {
+                right: {
+                    distance: { score: null, time: null, correct: 0, total: 0 },
+                    near: { score: null, time: null, correct: 0, total: 0 }
+                },
+                left: {
+                    distance: { score: null, time: null, correct: 0, total: 0 },
+                    near: { score: null, time: null, correct: 0, total: 0 }
+                }
+            };
+
+            backToTest();
+            initSnellenChart();
+        }
+
+        // Save results (simulated)
+        function saveResults() {
+            const rightResult = testResults.right[testType].score || 'Not tested';
+            const leftResult = testResults.left[testType].score || 'Not tested';
+
+            alert(`Results saved!\n\nRight Eye (${testType}): ${rightResult}\nLeft Eye (${testType}): ${leftResult}`);
+        }
+
+        // Event listeners
+        startBtn.addEventListener('click', startTest);
+        pauseBtn.addEventListener('click', pauseTest);
+        stopBtn.addEventListener('click', stopTest);
+        rightEyeBtn.addEventListener('click', () => switchEye('right'));
+        leftEyeBtn.addEventListener('click', () => switchEye('left'));
+        distanceBtn.addEventListener('click', () => switchTestType('distance'));
+        nearBtn.addEventListener('click', () => switchTestType('near'));
+        newTestBtn.addEventListener('click', resetTest);
+        saveResultsBtn.addEventListener('click', saveResults);
+        backToTestBtn.addEventListener('click', backToTest);
+        backToMenuBtn.addEventListener('click', () => window.location.href = 'MD.html');
+
+        // Initialize the chart when page loads
+        window.addEventListener('load', initSnellenChart);
+    </script>
+</body>
+
+</html>

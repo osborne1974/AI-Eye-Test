@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eye Dominance Tester</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #edf2f4;
+            color: var(--dark);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .test-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+
+        .target {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        .dot {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            cursor: move;
+            z-index: 3;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .instructions {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            max-width: 500px;
+        }
+
+        .result {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: none;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 15px 0;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .hands {
+            font-size: 3rem;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Eye Dominance Tester</h1>
+
+    <div class="instructions">
+        <h2>How to Test:</h2>
+        <ol style="text-align: left; padding-left: 20px;">
+            <li>Hold your phone/tablet at arm's length</li>
+            <li>Cover your <strong>left eye</strong> with your hand</li>
+            <li>Use your finger to drag the blue dot until it's centered in the white circle</li>
+            <li>Now cover your <strong>right eye</strong></li>
+            <li>If the dot stays centered, your <strong>right eye is dominant</strong></li>
+            <li>If it moves, your <strong>left eye is dominant</strong></li>
+        </ol>
+        <div class="hands">👁️ 👋</div>
+    </div>
+
+    <div class="test-container">
+        <div class="target"></div>
+        <div class="dot" id="draggableDot"></div>
+    </div>
+
+    <button id="testButton">Start Test</button>
+
+    <div class="result" id="result">
+        Your dominant eye is: <span id="dominantEye"></span>
+    </div>
+
+    <script>
+        const dot = document.getElementById('draggableDot');
+        const testButton = document.getElementById('testButton');
+        const resultDiv = document.getElementById('result');
+        const dominantEyeSpan = document.getElementById('dominantEye');
+
+        let isTesting = false;
+        let startPosition = { x: 0, y: 0 };
+        let dotPosition = { x: 0, y: 0 };
+
+        // Initialize dot position
+        function initDot() {
+            const container = document.querySelector('.test-container');
+            const containerRect = container.getBoundingClientRect();
+
+            // Start dot at random position near center
+            dotPosition = {
+                x: containerRect.width / 2 + (Math.random() * 100 - 50),
+                y: containerRect.height / 2 + (Math.random() * 100 - 50)
+            };
+
+            updateDotPosition();
+        }
+
+        // Update dot's visual position
+        function updateDotPosition() {
+            dot.style.left = `${dotPosition.x - 10}px`;
+            dot.style.top = `${dotPosition.y - 10}px`;
+        }
+
+        // Make dot draggable
+        dot.addEventListener('mousedown', (e) => {
+            if (!isTesting) return;
+
+            e.preventDefault();
+            startPosition = {
+                x: e.clientX - dotPosition.x,
+                y: e.clientY - dotPosition.y
+            };
+
+            document.addEventListener('mousemove', moveDot);
+            document.addEventListener('mouseup', stopDrag);
+        });
+
+        function moveDot(e) {
+            if (!isTesting) return;
+
+            dotPosition.x = e.clientX - startPosition.x;
+            dotPosition.y = e.clientY - startPosition.y;
+            updateDotPosition();
+        }
+
+        function stopDrag() {
+            document.removeEventListener('mousemove', moveDot);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        // Touch support for mobile
+        dot.addEventListener('touchstart', (e) => {
+            if (!isTesting) return;
+
+            e.preventDefault();
+            startPosition = {
+                x: e.touches[0].clientX - dotPosition.x,
+                y: e.touches[0].clientY - dotPosition.y
+            };
+
+            document.addEventListener('touchmove', touchMove);
+            document.addEventListener('touchend', touchEnd);
+        });
+
+        function touchMove(e) {
+            if (!isTesting) return;
+
+            dotPosition.x = e.touches[0].clientX - startPosition.x;
+            dotPosition.y = e.touches[0].clientY - startPosition.y;
+            updateDotPosition();
+        }
+
+        function touchEnd() {
+            document.removeEventListener('touchmove', touchMove);
+            document.removeEventListener('touchend', touchEnd);
+        }
+
+        // Test button handler
+        testButton.addEventListener('click', () => {
+            if (!isTesting) {
+                // Start test
+                isTesting = true;
+                testButton.textContent = "I've Aligned the Dot";
+                resultDiv.style.display = 'none';
+                initDot();
+            } else {
+                // End test
+                isTesting = false;
+                testButton.textContent = "Test Again";
+
+                // Calculate deviation from center
+                const container = document.querySelector('.test-container');
+                const containerRect = container.getBoundingClientRect();
+                const centerX = containerRect.width / 2;
+                const centerY = containerRect.height / 2;
+
+                const deviationX = dotPosition.x - centerX;
+                const deviationY = dotPosition.y - centerY;
+
+                // Determine eye dominance based on deviation
+                const isRightEyeDominant = Math.abs(deviationX) < 20 && Math.abs(deviationY) < 20;
+
+                dominantEyeSpan.textContent = isRightEyeDominant ? "Right Eye 👁️" : "Left Eye 👁️";
+                dominantEyeSpan.style.color = isRightEyeDominant ? "#4361ee" : "#ef233c";
+                resultDiv.style.display = 'block';
+            }
+        });
+
+        // Initialize
+        initDot();
+    </script>
+</body>
+
+</html>

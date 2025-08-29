@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Light Filter Advisor</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --warning: #f8961e;
+            --danger: #ef233c;
+            --dark: #2b2d42;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #edf2f4;
+            color: var(--dark);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .progress-container {
+            background: #e9ecef;
+            height: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: block;
+            margin: 10px auto;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .recommendation {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        .time-display {
+            font-size: 2.5rem;
+            text-align: center;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+
+        .intensity-option {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .intensity-option:hover {
+            background: #f8f9fa;
+        }
+
+        .intensity-option.active {
+            background: #e9ecef;
+            border-left: 4px solid var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>Blue Light Filter Advisor</h1>
+        <p>This tool analyzes your screen time and recommends optimal blue light reduction settings.</p>
+
+        <div class="card">
+            <h2>🕒 Screen Time Tracker</h2>
+            <div class="time-display" id="timeDisplay">00:00:00</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <button id="trackingBtn">Start Tracking</button>
+            <p>Safe threshold: <b>2 hours</b> | High risk: <b>4+ hours</b></p>
+        </div>
+
+        <div class="card">
+            <h2>🔵 Blue Light Exposure</h2>
+            <div id="recommendation" class="recommendation">
+                Start tracking to get recommendations...
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🛡️ Filter Intensity Options</h2>
+            <div class="intensity-option" onclick="setFilterIntensity('light')">
+                <div style="width:30px;height:30px;background:#e0fbfc;border-radius:50%;margin-right:15px;"></div>
+                <div>
+                    <h3>Light Filter (20%)</h3>
+                    <p>Subtle warmth for short sessions</p>
+                </div>
+            </div>
+            <div class="intensity-option" onclick="setFilterIntensity('medium')">
+                <div style="width:30px;height:30px;background:#98c1d9;border-radius:50%;margin-right:15px;"></div>
+                <div>
+                    <h3>Medium Filter (50%)</h3>
+                    <p>Balanced protection for moderate use</p>
+                </div>
+            </div>
+            <div class="intensity-option" onclick="setFilterIntensity('strong')">
+                <div style="width:30px;height:30px;background:#3d5a80;border-radius:50%;margin-right:15px;"></div>
+                <div>
+                    <h3>Strong Filter (80%)</h3>
+                    <p>Maximum protection for late nights</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Screen Time Tracking
+        let startTime;
+        let elapsedSeconds = 0;
+        let trackingInterval;
+        const trackingBtn = document.getElementById('trackingBtn');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const recommendationDiv = document.getElementById('recommendation');
+
+        // Start/stop tracking
+        trackingBtn.addEventListener('click', function () {
+            if (trackingBtn.textContent === 'Start Tracking') {
+                startTime = new Date();
+                trackingInterval = setInterval(updateTime, 1000);
+                trackingBtn.textContent = 'Stop Tracking';
+                trackingBtn.style.background = 'var(--danger)';
+            } else {
+                clearInterval(trackingInterval);
+                trackingBtn.textContent = 'Start Tracking';
+                trackingBtn.style.background = 'var(--primary)';
+            }
+        });
+
+        // Update timer display
+        function updateTime() {
+            elapsedSeconds++;
+            const hours = Math.floor(elapsedSeconds / 3600);
+            const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+            const seconds = elapsedSeconds % 60;
+
+            timeDisplay.textContent =
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            updateRecommendation();
+        }
+
+        // Update progress bar and recommendations
+        function updateRecommendation() {
+            const hours = elapsedSeconds / 3600;
+            const progressPercent = Math.min(100, (hours / 4) * 100);
+            progressBar.style.width = `${progressPercent}%`;
+
+            // Change progress bar color based on risk level
+            if (hours < 2) {
+                progressBar.style.background = 'var(--primary)';
+                recommendationDiv.style.background = '#e8f4f8';
+                recommendationDiv.innerHTML = `
+                    <span style="color:var(--primary)">✓ Safe Zone</span><br>
+                    You've used screens for <b>${hours.toFixed(1)} hours</b>.<br>
+                    No filter needed yet, but consider taking breaks every 20 minutes.`;
+            }
+            else if (hours < 4) {
+                progressBar.style.background = 'var(--warning)';
+                recommendationDiv.style.background = '#fff3e9';
+                recommendationDiv.innerHTML = `
+                    <span style="color:var(--warning)">⚠ Moderate Exposure</span><br>
+                    You've used screens for <b>${hours.toFixed(1)} hours</b>.<br>
+                    Recommended: <b>Medium filter (50%)</b> and 5-minute breaks hourly.`;
+            }
+            else {
+                progressBar.style.background = 'var(--danger)';
+                recommendationDiv.style.background = '#fee8e9';
+                recommendationDiv.innerHTML = `
+                    <span style="color:var(--danger)">! High Exposure</span><br>
+                    You've used screens for <b>${hours.toFixed(1)} hours</b>.<br>
+                    <b>Strong filter (80%) recommended</b> with 10-minute breaks every 45 minutes.<br>
+                    Avoid screens 1 hour before bedtime.`;
+            }
+        }
+
+        // Apply visual filter (simulated)
+        function setFilterIntensity(level) {
+            // Remove existing active class
+            document.querySelectorAll('.intensity-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+
+            // Add active class to selected option
+            event.currentTarget.classList.add('active');
+
+            // In a real app, you would apply an actual CSS filter to the page
+            let filterCSS = '';
+            switch (level) {
+                case 'light':
+                    filterCSS = 'sepia(0.1) hue-rotate(-5deg)';
+                    break;
+                case 'medium':
+                    filterCSS = 'sepia(0.3) hue-rotate(-10deg) brightness(0.95)';
+                    break;
+                case 'strong':
+                    filterCSS = 'sepia(0.5) hue-rotate(-15deg) brightness(0.9)';
+                    break;
+            }
+
+            // For demo purposes, we'll just show what would happen
+            recommendationDiv.innerHTML += `<div style="margin-top:10px;color:var(--primary)">
+                <i>Sample applied: <code>filter: ${filterCSS}</code></i>
+            </div>`;
+        }
+
+        // Initialize with medium filter as default
+        window.onload = function () {
+            document.querySelectorAll('.intensity-option')[1].classList.add('active');
+        };
+    </script>
+</body>
+
+</html>
